@@ -1,0 +1,23 @@
+{
+  "name": "do-an-cnm-cq2017",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/striderbinhphan/do-an-cnm-cq2017.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/striderbinhphan/do-an-cnm-cq2017/issues"
+  },
+  "homepage": "https://github.com/striderbinhphan/do-an-cnm-cq2017#readme",
+  "dependencies": {
+    "crypto-js": "^4.0.0",
+    "elliptic": "^6.5.4"
+  }
+}
