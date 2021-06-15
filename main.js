@@ -20,9 +20,11 @@ const organization2 = new Address("organization2", "organization");
 const donator1 = new Address("donator1", "donator");
 const donator2 = new Address("organization2", "donator");
 
+console.log(organization1.getAddress());
+console.log(organization1.getPrivateKey());
 console.log(donator1.getAddress());
-console.log(donator1.getPrivateKey());
 
+console.log(donator1.getPrivateKey());
 
 charityBlockChain.createUser(beneficiary1);
 charityBlockChain.createUser(beneficiary2);

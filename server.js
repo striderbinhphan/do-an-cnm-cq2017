@@ -95,7 +95,7 @@ app.get('/blocks',(req,res)=>{
 app.get('/projects',(req,res)=>{
   res.json(charityBlockChain.getProjectList()).end();
 })
-app.post('/projects',(req,res)=>{
+app.post('/projects',async (req,res)=>{
   const {projectName, projectBeneficiaryCreateAddress, projectDescription, projectDeadline, privateKey} = req.body;
   const project ={
     projectName,
@@ -106,11 +106,14 @@ app.post('/projects',(req,res)=>{
   }
   const createrEcKey = ec.keyFromPrivate(privateKey,'hex');
   
-  if(charityBlockChain.createProject(project,createrEcKey)){
+  if(await charityBlockChain.createProject(project,createrEcKey)){
     return res.json({status:"Created project"}).end();
   }else{
     return res.json({status:"failed"}).end();
   }
+})
+app.get('/unconfirm-projects',(req,res)=>{
+  res.json(charityBlockChain.getUnconfirmProjectList()).end();
 })
 httpServer.listen(PORT, () =>
   console.info(`Express server running on http://localhost:${PORT}...`)

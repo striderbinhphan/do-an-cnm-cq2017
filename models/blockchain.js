@@ -40,6 +40,9 @@ class CharityBlockChain{
     getProjectList(){
         return this.projectList;
     }
+    getUnconfirmProjectList(){
+        return this.projectList.filter(c=>c.projectOrganizationConfirmAddress===null);
+    }
     getUserList(){
         return this.addressList;
     }
@@ -78,9 +81,7 @@ class CharityBlockChain{
 
             const createdTxs = new Transaction("create",newProjectInfo);
             createdTxs.signTransaction(ecKey);
-            console.log(this.addTransaction(createdTxs));
-            const isValid = await this.addTransaction(createdTxs);
-            if(isValid[0]){
+            if(await this.addTransaction(createdTxs)){
                 return true;
             } else{
                 this.projectList.splice(this.projectList.length -1, 1);
@@ -94,18 +95,21 @@ class CharityBlockChain{
         }
     }
     //===========confirm project involved methods 
-    confirmProject(projectInfo,confirmEcKey){
+    async confirmProject(projectInfo,confirmEcKey){
         if(this.isExistingProjectById(projectInfo.projectId)){
            
             const confirmTxs = new Transaction("confirm",projectInfo);
             confirmTxs.signTransaction(confirmEcKey);
-            this.addTransaction(confirmTxs); 
+            if(await this.addTransaction(confirmTxs)){ 
 
-            this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress = confirmEcKey.getPublic('hex');
-            this.projectList[projectInfo.projectId].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
+                this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress = confirmEcKey.getPublic('hex');
+                this.projectList[projectInfo.projectId].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
 
-            //delete projectTemp;
-            return true;
+                //delete projectTemp;
+                return true;
+            }else{
+                return false;
+            }
         }
         else{
             console.log("This charity project has id which existing in our blockchain");
@@ -122,15 +126,16 @@ class CharityBlockChain{
             return false;
         }
     }
-    donateProject(donateInfo,donaterEcKey){
+    async donateProject(donateInfo,donaterEcKey){
         if(this.isExistingProjectById(donateInfo.projectId)){
            if(this.verifyDonateTimestamp(donateInfo.projectId,donateInfo.donateTimestamp)){
                 const donateTxs = new Transaction("donate",donateInfo);
                 donateTxs.signTransaction(donaterEcKey);
-                this.addTransaction(donateTxs); 
-
-                //delete projectTemp;
-                return true;
+                if(await this.addTransaction(donateTxs)){
+                    return true;
+                } else{
+                    return false;
+                }
            }else{
                return false;
            }
@@ -142,7 +147,7 @@ class CharityBlockChain{
         }
     }
      //============sending money from donate => organization or organization to beneficiary
-     sendbackProject(sendbackInfo,orgaEcKey){
+    async sendbackProject(sendbackInfo,orgaEcKey){
         if(this.isExistingProjectById(sendbackInfo.projectId)){
             if(this.projectList[sendbackInfo.projectId].projectOrganizationConfirmAddress!==sendbackInfo.fromAddress ||
                 this.projectList[sendbackInfo.projectId].projectBeneficiaryCreateAddress!==sendbackInfo.toAddress){
@@ -153,10 +158,11 @@ class CharityBlockChain{
             }else{
                 const sendbackTxs = new Transaction("sendback",sendbackInfo);
                 sendbackTxs.signTransaction(orgaEcKey);
-                this.addTransaction(sendbackTxs); 
-    
-                //delete projectTemp;
-                return true;
+                if(await this.addTransaction(sendbackTxs)){
+                    return true;
+                } else{
+                    return false;
+                }
             }
         }
         else{
