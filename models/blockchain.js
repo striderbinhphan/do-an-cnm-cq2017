@@ -78,10 +78,14 @@ class CharityBlockChain{
 
             const createdTxs = new Transaction("create",newProjectInfo);
             createdTxs.signTransaction(ecKey);
-            this.addTransaction(createdTxs); 
+            console.log(this.addTransaction(createdTxs));
+            if(this.addTransaction(createdTxs)){
+                return true;
+            } else{
+                this.projectList.splice(this.projectList.length -1, 1);
+                return false;
+            }
 
-            //delete projectTemp;
-            return true;
         }
         else{
             console.log("This charity project has name which existing in our blockchain");

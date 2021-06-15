@@ -89,8 +89,29 @@ app.post("/request-join", (req, res) => {
       res.json({ status: "Added node" }).end();
     }
 });
-   
-
+app.get('/blocks',(req,res)=>{
+  res.json(charityBlockChain.getBlocks()).end();
+})   
+app.get('/projects',(req,res)=>{
+  res.json(charityBlockChain.getProjectList()).end();
+})
+app.post('/projects',(req,res)=>{
+  const {projectName, projectBeneficiaryCreateAddress, projectDescription, projectDeadline, privateKey} = req.body;
+  const project ={
+    projectName,
+    projectBeneficiaryCreateAddress,
+    projectDescription,
+    projectDeadline,
+    projectCreateTimestamp: new Date().getTime()/1000
+  }
+  const createrEcKey = ec.keyFromPrivate(privateKey,'hex');
+  
+  if(charityBlockChain.createProject(project,createrEcKey)){
+    return res.json({status:"Created project"}).end();
+  }else{
+    return res.json({status:"failed"}).end();
+  }
+})
 httpServer.listen(PORT, () =>
   console.info(`Express server running on http://localhost:${PORT}...`)
 );
