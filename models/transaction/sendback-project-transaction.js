@@ -1,19 +1,19 @@
 const SHA256 = require("crypto-js/sha256");
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
-class DonateTransaction{
-    constructor(projectId, fromAddress, toAddress, amount, timestamp) {
+class SendbackProjectTransaction{
+    constructor(projectId, fromAddress, toAddress, amount, sendbackTimestamp) {
         this.projectId  = projectId; 
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount  = amount;
-        this.timestamp = timestamp;
+        this.sendbackTimestamp = sendbackTimestamp;
     }
     calculateHash(){
-        return SHA256(this.projectId + this.fromAddress+this.toAddress+this.amount+this.timestamp).toString();
+        return SHA256(this.projectId + this.fromAddress+this.toAddress+this.amount+this.sendbackTimestamp).toString();
     }
     signTransaction(senderEcKey){
-        console.log("signing donate transaction");
+        console.log("signing sendback transaction");
 
         if(senderEcKey.getPublic('hex') != this.fromAddress){
             return 'You cannot sign transaction with another wallets!';
@@ -38,7 +38,7 @@ class DonateTransaction{
         this.fromAddress = data.fromAddress;
         this.toAddress = data.toAddress;
         this.amount  = data.amount;
-        this.timestamp = data.timestamp;
+        this.sendbackTimestamp = data.sendbackTimestamp;
     }
 }
-module.exports = DonateTransaction;
+module.exports = SendbackProjectTransaction;

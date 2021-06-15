@@ -2,19 +2,18 @@ const SHA256 = require("crypto-js/sha256");
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 class ConfirmProjectTransaction{
-    constructor(projectId,organizeAddress, beneficiaryAddress,timestamp){
+    constructor(projectId,projectOrganizationConfirmAddress, projectConfirmTimestamp){
         this.projectId = projectId;
-        this.organizeAddress = organizeAddress;
-        this.beneficiaryAddress = beneficiaryAddress;
-        this.timestamp = timestamp;
+        this.projectOrganizationConfirmAddress = projectOrganizationConfirmAddress;
+        this.projectConfirmTimestamp = projectConfirmTimestamp;
     }
     
     calculateHash(){
-        return SHA256(this.projectId+this.organizeAddress+this.beneficiaryAddress+this.timestamp).toString();
+        return SHA256(this.projectId+this.projectOrganizationConfirmAddress+this.projectConfirmTimestamp).toString();
     }
     signTransaction(organizationEcKey){
         console.log("signing confirm transaction");
-        if(organizationEcKey.getPublic('hex') != this.organizeAddress){
+        if(organizationEcKey.getPublic('hex') != this.projectOrganizationConfirmAddress){
             console.log('You cannot sign transaction with another wallets!')
             return false;
         }
@@ -30,14 +29,13 @@ class ConfirmProjectTransaction{
             console.log('No signature in this transaction')
             return false;
         }
-        const publicKey  = ec.keyFromPublic(this.organizeAddress,'hex');
+        const publicKey  = ec.keyFromPublic(this.projectOrganizationConfirmAddress,'hex');
         return publicKey.verify(this.calculateHash(),this.signature);
     }
     parseData(data) {
         this.projectId = data.projectId;
-        this.organizeAddress = data.organizeAddress;
-        this.beneficiaryAddress = data.beneficiaryAddress;
-        this.timestamp = data.timestamp;
+        this.projectOrganizationConfirmAddress = data.projectOrganizationConfirmAddress;
+        this.projectConfirmTimestamp = data.projectConfirmTimestamp;
     }
 }
 module.exports = ConfirmProjectTransaction;
