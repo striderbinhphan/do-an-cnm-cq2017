@@ -67,7 +67,7 @@ class CharityBlockChain{
     isExistingProjectById(projectId){
         return this.projectList.map(p=>p.projectId).includes(projectId);
     }
-    createProject(newProjectInfo,ecKey){
+    async createProject(newProjectInfo,ecKey){
         if(!this.isExistingProjectByName(newProjectInfo.projectName)){
             const projectTemp = new charityProject(null,null,null,null,null,null,null);
             newProjectInfo.projectId = this.projectList.length;
@@ -79,7 +79,8 @@ class CharityBlockChain{
             const createdTxs = new Transaction("create",newProjectInfo);
             createdTxs.signTransaction(ecKey);
             console.log(this.addTransaction(createdTxs));
-            if(this.addTransaction(createdTxs)){
+            const isValid = await this.addTransaction(createdTxs);
+            if(isValid[0]){
                 return true;
             } else{
                 this.projectList.splice(this.projectList.length -1, 1);
