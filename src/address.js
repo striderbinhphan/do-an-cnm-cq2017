@@ -1,6 +1,13 @@
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+//Description UserAddress in our blockchain
 class Address{
+    constructor(name,role){
+        
+        this.name = name;
+        this.role = role;
+        this.privateKey = this.generateKeyPair(name,role);
+    }
     generateKeyPair(name, role){
         const key = ec.genKeyPair();
         const publicKey = key.getPublic('hex');
@@ -8,13 +15,13 @@ class Address{
         this.address = publicKey;
         this.name = name;
         this.role = role;
-        return JSON.stringify({
-            publicKey: publicKey,
-            privateKey: privateKey
-        })
+        return privateKey;
     }
     getAddress(){
         return this.address;
+    }
+    getPrivateKey(){
+        return this.privateKey;
     }
     //publicKey == address
     isValidPrivateKey(inputPrivateKey){

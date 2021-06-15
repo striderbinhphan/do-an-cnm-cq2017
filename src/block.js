@@ -1,4 +1,5 @@
 const Transaction = require('./transaction');
+//Description block in our blockchain
 class Block{
     constructor(index,timestamp, transactions, previousHash, difficulty, nonce, hash)
     {

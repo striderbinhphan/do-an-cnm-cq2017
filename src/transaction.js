@@ -1,28 +1,45 @@
 const SHA256 = require("crypto-js/sha256");
-
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 const CreateProjectTransaction = require('./create-project-transaction')
 const ConfirmProjectTransaction = require('./confirm-project-transaction')
 const DonateTransaction = require('./donate-transaction')
 class Transaction {
     constructor(type, data){
        this.type = type;
-       this.data = this.dataParse(data); 
+       if(type === "create"){
+            this.data = new CreateProjectTransaction(null,null,null);
+            //data.projectId, data.beneficiaryAddress, data.timestamp
+            if(data!==null){
+                this.data.parseData(data);
+            }
+            
+        }
+        if(type==="confirm"){
+           
+            this.data = new ConfirmProjectTransaction(null,null,null,null);
+            //data.projectId, data.beneficiaryAddress, data.timestamp
+            if(data!==null){
+                this.data.parseData(data);
+            }
+            
+        }
+        if(type==="donate"){
+            this.data = new DonateTransaction(null,null,null,null,null);
+            if(data!==null){
+                this.data.parseData(data);
+            }
+           
+        }
+       
     }
-    //transaction co 2 loai: CreateProjectTransaction, DonateTransaction tuy theo type de luu data tuong ung
-    dataParse(data){
-        if(this.type === "create"){
-            return new CreateProjectTransaction(data.projectId, data.beneficiaryAddress, data.timestamp);
-        }
-        if(this.type==="confirm"){
-            return new ConfirmProjectTransaction(data.projectId, data.organizeAddress, data.beneficiaryAddress, data.timestamp);
-        }
-        if(this.type==="donate"){
-            return new DonateTransaction( data.projectId, data.fromAddress, data.toAddress, data.amount, data.timestamp);
-        }
+    signTransaction(ecKey){
+        
+        return this.data.signTransaction(ecKey);
     }
     isValidTransaction(){
         return this.data.isValidTransaction();
     }
-   
+    
 }
 module.exports = Transaction;

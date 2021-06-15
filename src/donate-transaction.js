@@ -8,16 +8,17 @@ class DonateTransaction{
         this.toAddress = toAddress;
         this.amount  = amount;
         this.timestamp = timestamp;
-        this.hahs =this.calculateHash();
     }
-    calculateHash = () =>{
-        return SHA256(this.projectId + this.fromAddress+this.toAddress+this.amount+this.timestamp);
+    calculateHash(){
+        return SHA256(this.projectId + this.fromAddress+this.toAddress+this.amount+this.timestamp).toString();
     }
-    signTransaction = (senderEcKey) => {
+    signTransaction(senderEcKey){
+        console.log("signing donate transaction");
+
         if(senderEcKey.getPublic('hex') != this.fromAddress){
-            console.log('You cannot sign transaction with another wallets!')
-            return false;
+            return 'You cannot sign transaction with another wallets!';
         }
+        const hashTx = this.calculateHash();
         const sig = senderEcKey.sign(hashTx,'base64');
         this.signature  = sig.toDER('hex');
     }
@@ -30,7 +31,14 @@ class DonateTransaction{
             return false;
         }
         const publicKey  = ec.keyFromPublic(this.fromAddress,'hex');
-        return publicKey.verify(this.hash,this.signature);
+        return publicKey.verify(this.calculateHash(),this.signature);
+    }
+    parseData(data) {
+        this.projectId  = data.projectId; 
+        this.fromAddress = data.fromAddress;
+        this.toAddress = data.toAddress;
+        this.amount  = data.amount;
+        this.timestamp = data.timestamp;
     }
 }
 module.exports = DonateTransaction;

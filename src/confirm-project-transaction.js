@@ -7,17 +7,19 @@ class ConfirmProjectTransaction{
         this.organizeAddress = organizeAddress;
         this.beneficiaryAddress = beneficiaryAddress;
         this.timestamp = timestamp;
-        this.hash = this.calculateHash();
     }
-    calculateHash = () =>{
-        return SHA256(this.projectId+this.organizeAddress+this.beneficiaryAddress+this.timestamp);
+    
+    calculateHash(){
+        return SHA256(this.projectId+this.organizeAddress+this.beneficiaryAddress+this.timestamp).toString();
     }
-    signTransaction = (organizeEcKey) => {
-        if(organizeEcKey.getPublic('hex') != this.organizeAddress){
+    signTransaction(organizationEcKey){
+        console.log("signing confirm transaction");
+        if(organizationEcKey.getPublic('hex') != this.organizeAddress){
             console.log('You cannot sign transaction with another wallets!')
             return false;
         }
-        const sig = organizeEcKey.sign(hashTx,'base64');
+        const hashTx = this.calculateHash();
+        const sig = organizationEcKey.sign(hashTx,'base64');
         this.signature  = sig.toDER('hex');
     }
     isValidTransaction(){
@@ -29,7 +31,13 @@ class ConfirmProjectTransaction{
             return false;
         }
         const publicKey  = ec.keyFromPublic(this.organizeAddress,'hex');
-        return publicKey.verify(this.hash,this.signature);
+        return publicKey.verify(this.calculateHash(),this.signature);
+    }
+    parseData(data) {
+        this.projectId = data.projectId;
+        this.organizeAddress = data.organizeAddress;
+        this.beneficiaryAddress = data.beneficiaryAddress;
+        this.timestamp = data.timestamp;
     }
 }
 module.exports = ConfirmProjectTransaction;

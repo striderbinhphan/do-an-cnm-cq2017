@@ -6,16 +6,18 @@ class CreateProjectTransaction{
         this.projectId = projectId;
         this.beneficiaryAddress = beneficiaryAddress;
         this.timestamp = timestamp;
-        this.hash = this.calculateHash();
     }
-    calculateHash = () =>{
-        return SHA256(this.projectId+this.beneficiaryAddress+this.timestamp);
+
+    calculateHash(){
+        return SHA256(this.projectId+this.beneficiaryAddress+this.timestamp).toString();
     }
-    signTransaction = (beneficiaryEcKey) => {
+    signTransaction(beneficiaryEcKey) {
+        console.log("Signing created Transaction");
         if(beneficiaryEcKey.getPublic('hex') != this.beneficiaryAddress){
             return 'You cannot sign transaction with another wallets!';
         }
-        const sig = beneficiaryEcKey.sign(this.hash,'base64');
+        const hashTx = this.calculateHash();
+        const sig = beneficiaryEcKey.sign(hashTx,'base64');
         this.signature  = sig.toDER('hex');
     }
     isValidTransaction(){
@@ -27,7 +29,12 @@ class CreateProjectTransaction{
             return false;
         }
         const publicKey  = ec.keyFromPublic(this.beneficiaryAddress,'hex');
-        return publicKey.verify(this.hash,this.signature);
+        return publicKey.verify(this.calculateHash(),this.signature);
+    }
+    parseData(data) {
+        this.projectId = data.projectId;
+        this.beneficiaryAddress = data.beneficiaryAddress;
+        this.timestamp = data.timestamp;
     }
 }
 module.exports = CreateProjectTransaction;
