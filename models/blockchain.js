@@ -43,6 +43,14 @@ class CharityBlockChain{
     getUnconfirmProjectList(){
         return this.projectList.filter(c=>c.projectOrganizationConfirmAddress===null);
     }
+    getDonateProjectList(){
+        const currentDate = new Date().getTime();
+        return this.projectList.filter(c=>(c.projectOrganizationConfirmAddress!==null&&c.projectDeadline>=currentDate));
+    }
+    getOrganizationConfirmAddressFromProjectId(projectId){
+        console.log()
+        return this.projectList[projectId].projectOrganizationConfirmAddress;
+    }
     getUserList(){
         return this.addressList;
     }
@@ -82,8 +90,10 @@ class CharityBlockChain{
             const createdTxs = new Transaction("create",newProjectInfo);
             createdTxs.signTransaction(ecKey);
             if(await this.addTransaction(createdTxs)){
+                this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
                 return true;
             } else{
+                console.log("This transaction is invalid(matched add & privateKey)");
                 this.projectList.splice(this.projectList.length -1, 1);
                 return false;
             }
@@ -96,11 +106,12 @@ class CharityBlockChain{
     }
     //===========confirm project involved methods 
     async confirmProject(projectInfo,confirmEcKey){
-        if(this.isExistingProjectById(projectInfo.projectId)){
+        if(this.isExistingProjectById(projectInfo.projectId)&& this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress===null){
            
             const confirmTxs = new Transaction("confirm",projectInfo);
             confirmTxs.signTransaction(confirmEcKey);
             if(await this.addTransaction(confirmTxs)){ 
+                this.io.emit(transactions.ADD_TRANSACTION,confirmTxs);
 
                 this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress = confirmEcKey.getPublic('hex');
                 this.projectList[projectInfo.projectId].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
@@ -108,11 +119,13 @@ class CharityBlockChain{
                 //delete projectTemp;
                 return true;
             }else{
+                console.log("This transaction is invalid(matched add & privateKey)");
+
                 return false;
             }
         }
         else{
-            console.log("This charity project has id which existing in our blockchain");
+            console.log("This charity project has id which existing in our blockchain & this charity project has been confirmed");
             return false;
         }
     }
@@ -132,8 +145,12 @@ class CharityBlockChain{
                 const donateTxs = new Transaction("donate",donateInfo);
                 donateTxs.signTransaction(donaterEcKey);
                 if(await this.addTransaction(donateTxs)){
+                    this.io.emit(transactions.ADD_TRANSACTION,donateTxs);
+                    
                     return true;
                 } else{
+                    console.log("This transaction is invalid(matched add & privateKey)");
+
                     return false;
                 }
            }else{
@@ -159,8 +176,10 @@ class CharityBlockChain{
                 const sendbackTxs = new Transaction("sendback",sendbackInfo);
                 sendbackTxs.signTransaction(orgaEcKey);
                 if(await this.addTransaction(sendbackTxs)){
+                    this.io.emit(transactions.ADD_TRANSACTION,sendbackTxs);
                     return true;
                 } else{
+                console.log("This transaction is invalid(matched add & privateKey)");
                     return false;
                 }
             }

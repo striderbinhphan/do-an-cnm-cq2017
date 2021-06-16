@@ -68,15 +68,15 @@ const socketListeners = (io, socket, chain) => {
 
 
 
-  // socket.on(transactions.ADD_ELECTION, (data) => {
+  // socket.on(transactions.ADD_TRANSACTION, (data) => {
   //   const { year, name, nominees, deadline } = data;
   //   chain.setElection(year, name, nominees, deadline);
   // });
 
-  // socket.on(transactions.EXTENT_ELECTION, (data) => {
-  //   const { year, name, newDeadline } = data;
-  //   chain.extentElection(year, name, newDeadline);
-  // });
+  socket.on(transactions.EXTEND_PROJECT_DEADLINE, (data) => {
+    const { year, name, newDeadline } = data;
+    chain.extentElection(year, name, newDeadline);
+  });
 
   socket.on(transactions.CHECKING, () => {
     console.log("Im OK");

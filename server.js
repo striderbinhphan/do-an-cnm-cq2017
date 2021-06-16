@@ -102,7 +102,7 @@ app.post('/projects',async (req,res)=>{
     projectBeneficiaryCreateAddress,
     projectDescription,
     projectDeadline,
-    projectCreateTimestamp: new Date().getTime()/1000
+    projectCreateTimestamp: new Date().getTime()//ms
   }
   const createrEcKey = ec.keyFromPrivate(privateKey,'hex');
   
@@ -115,6 +115,63 @@ app.post('/projects',async (req,res)=>{
 app.get('/unconfirm-projects',(req,res)=>{
   res.json(charityBlockChain.getUnconfirmProjectList()).end();
 })
+app.post('/unconfirm-projects',async (req,res)=>{
+  const {projectId, projectOrganizationConfirmAddress, privateKey}  = req.body;
+  const confirmData  = {
+    projectId,
+    projectOrganizationConfirmAddress,
+    projectConfirmTimestamp: new Date().getTime()//ms
+  }
+  const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
+  if(await charityBlockChain.confirmProject(confirmData,confirmEcKey)){
+    res.json({status:"Confirm project success"}).end();
+  }else{
+    res.json({status:"Confirm project failed"}).end();
+  }
+})
+app.get('/donate-projects',(req,res)=>{
+  res.json(charityBlockChain.getDonateProjectList()).end();
+})
+app.post('/donate-projects',async (req,res)=>{
+  const {projectId, fromAddress, amount, privateKey}  = req.body;
+  console.log(projectId);
+  const toOrganizationAddress = charityBlockChain.getOrganizationConfirmAddressFromProjectId(projectId);
+  const donateData  = {
+    projectId,
+    fromAddress,
+    toAddress: toOrganizationAddress,
+    amount,
+    donateTimestamp: new Date().getTime()//ms,
+  }
+  const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
+  if(await charityBlockChain.donateProject(donateData,confirmEcKey)){
+    res.json({status:"Donate project success"}).end();
+  }else{
+    res.json({status:"Donate project failed"}).end();
+  }
+})
+
+io.on("connection", (socket) => {
+  console.info(`Socket connected, ID: ${socket.id}`);
+
+  if (status === false) {
+    setInterval(function () {
+      if (!charityBlockChain.miningStatus) {
+        io.emit(transactions.CHECKING);
+      }
+    }, 300000);
+  }
+
+  socket.on("disconnect", () => {
+    console.log(`Socket disconnected, ID: ${socket.id}`);
+    for (let index = 0; index < nodeList.length; index++) {
+      if (nodeList[index].id === socket.id) {
+        nodeList.splice(index, 1);
+        break;
+      }
+    }
+  });
+});
 httpServer.listen(PORT, () =>
   console.info(`Express server running on http://localhost:${PORT}...`)
 );

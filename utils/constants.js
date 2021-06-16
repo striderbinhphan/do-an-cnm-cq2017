@@ -6,8 +6,7 @@ module.exports.transactions = {
     CHAIN_VERIFY: "chain_verify",
     ADD_NODE: "add_node",
     HELLO: "hello",
-    ADD_ELECTION: "add_election",
-    EXTENT_ELECTION: "extent_election",
+    EXTEND_PROJECT_DEADLINE: "extend_project_deadline",
     CHECKING: "checking",
   };
   

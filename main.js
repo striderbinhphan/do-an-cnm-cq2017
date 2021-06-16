@@ -68,7 +68,6 @@ charityBlockChain.confirmProject(confirmData,orKey);
 const donateData ={
     projectId :0,
     fromAddress: doAddress,
-    toAddress : orAddress,
     amount: 100,
     donateTimestamp : 12340,
 };
