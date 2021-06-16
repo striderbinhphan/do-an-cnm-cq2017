@@ -69,6 +69,9 @@ class CharityBlockChain{
     isUserExisting(publicKey){
         return this.addressList.map((ad)=>ad.address).includes(publicKey);
     }
+    getUserInfo(publicKey){
+        return this.addressList[this.addressList.map((ad)=>ad.address).indexOf(publicKey)];
+    }
     //============create project involved methods =============
     getSumOfProject(){
         return this.projectList.length;

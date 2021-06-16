@@ -35,7 +35,12 @@ app.post('/login',(req,res)=>{
   const {publicKey, privateKey} = req.body;
   if(charityBlockChain.isUserExisting(publicKey)){
     if(ec.keyFromPrivate(privateKey,'hex').getPublic('hex')===publicKey){
-      res.json({status:"success"}).end();
+        const payload = charityBlockChain.getUserInfo(publicKey);
+      res.json({
+        status:"success",
+        name: payload.name,
+        role: payload.role
+    }).end();
     }else{
       res.json({status:"invalid private/public key"}).end();
     }
