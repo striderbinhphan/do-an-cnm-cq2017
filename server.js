@@ -13,7 +13,7 @@ const BlockChain =require('./models/blockchain');
 const Address = require('./models/address/address')
 const {transactions} = require('./utils/constants');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
 app.use(logger('dev'));
 
