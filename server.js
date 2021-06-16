@@ -39,7 +39,8 @@ app.post('/login',(req,res)=>{
       res.json({
         status:"success",
         name: payload.name,
-        role: payload.role
+        role: payload.role,
+        address: payload.address
     }).end();
     }else{
       res.json({status:"invalid private/public key"}).end();
