@@ -66,7 +66,9 @@ class CharityBlockChain{
         this.addressList.push(newUser);
         //console.log("added new User:" ,newUser);
     }   
-
+    isUserExisting(publicKey){
+        return this.addressList.map((ad)=>ad.address).includes(publicKey);
+    }
     //============create project involved methods =============
     getSumOfProject(){
         return this.projectList.length;

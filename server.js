@@ -10,6 +10,7 @@ const axios = require("axios");
 const EC =require('elliptic').ec;
 const ec = new EC('secp256k1');
 const BlockChain =require('./models/blockchain');
+const Address = require('./models/address/address')
 const {transactions} = require('./utils/constants');
 
 const PORT = process.env.PORT || 3000;
@@ -19,7 +20,29 @@ app.use(logger('dev'));
 const charityBlockChain = new BlockChain(io,null);
 var nodeList = [];
 var status = false;
-
+app.post('/register',(req,res)=>{
+  const {name, role} = req.body;
+  const newUser = new Address(name,role);
+  charityBlockChain.createUser(newUser);
+  res.json({
+    status:"success",
+    name:newUser.name,
+    address: newUser.address,
+    privateKey: newUser.privateKey
+  }).end();
+})
+app.post('/login',(req,res)=>{
+  const {publicKey, privateKey} = req.body;
+  if(charityBlockChain.isUserExisting(publicKey)){
+    if(ec.keyFromPrivate(privateKey,'hex').getPublic('hex')===publicKey){
+      res.json({status:"success"}).end();
+    }else{
+      res.json({status:"invalid private/public key"}).end();
+    }
+  }else{
+    res.json({status:"This address isn't exist! please register"}).end();
+  }
+})
 app.post("/nodes", (req, res) => {
     const { host } = req.body;
     const { callback, nodeLength } = req.query;
