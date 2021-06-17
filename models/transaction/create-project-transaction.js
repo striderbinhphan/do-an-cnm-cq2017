@@ -27,7 +27,7 @@ class CreateProjectTransaction{
         if(!this.signature || this.signature.length ===0){
             console.log("No signature in this transaction");
             return false;
-        }
+        };
         const publicKey  = ec.keyFromPublic(this.projectBeneficiaryCreateAddress,'hex');
         return publicKey.verify(this.calculateHash(),this.signature);
     }

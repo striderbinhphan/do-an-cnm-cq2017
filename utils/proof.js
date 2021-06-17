@@ -1,6 +1,6 @@
 const { constants } = require("./constants");
 const {calculateHash, hashMatchesDifficulty} = require('./common-function');
-process.on("message", (block) => {
+process.on("message", (block) => {//newblock
   const { index, timestamp, transactions, previousHash,  difficulty} = block;
   let count = 0;
   let nonce = 0;
@@ -11,7 +11,7 @@ process.on("message", (block) => {
             // if (hash.substring(0,difficulty)== Array(difficulty+1).join("0")) {
             //     return new Block(index,timestamp,transactions,previousHash,difficulty,nonce, hash);
             // }
-            if(hashMatchesDifficulty(hash,difficulty)){
+            if(hashMatchesDifficulty(hash,difficulty)){//
                 console.log("I minne a block");
                 process.send(nonce);
                 console.log(

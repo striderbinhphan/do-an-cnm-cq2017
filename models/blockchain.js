@@ -7,8 +7,9 @@ const ec = new EC('secp256k1');
 const fork = require('../utils/global');
 const {transactions, constants}  = require('../utils/constants');
 const {calculateHash, hashMatchesDifficulty, calculateHashFromBlock} = require('../utils/common-function');
-class CharityBlockChain{
+class CharityBlockChain{//blockchain services
     constructor(io, blocks){
+        
         this.difficulty = 3;//dokho
         this.blocks = blocks||[this.createGenesisBlock()];//blocks
         this.pendingTransactions = [];//nhung transaction chua duoc mine
@@ -16,11 +17,13 @@ class CharityBlockChain{
         this.projectList = []; //project in charityBlocckchain
         this.nodes = [];//node connecting
         this.io = io;//socketioserver
+        
+        
         //mining variables
         this.transactionBuffer = null;//danh sach transaction chuan bi mine
         this.blockBuffer = null; //luu tru danh sach block send di trong p2p 
-        this.miningStatus =false; //trang thai mining cua blockchain
         this.isConfirm = false;//block buffer save block from other node to adding this blockchain
+        this.miningStatus =false; //trang thai mining cua blockchain
         this.confirm = 0 ;
         this.deny = 0;
     }
@@ -88,12 +91,15 @@ class CharityBlockChain{
             const projectTemp = new charityProject(null,null,null,null,null,null,null);
             newProjectInfo.projectId = this.projectList.length;
             projectTemp.setInfo(newProjectInfo);
-            this.projectList.push(projectTemp);
+            this.projectList.push(projectTemp);//luu database
+            //projectId
             console.log("created Project:",projectTemp);
             //console.log("project list",this.projectList);
 
-            const createdTxs = new Transaction("create",newProjectInfo);
+            const createdTxs = new Transaction("create",newProjectInfo);//CreateProjectTransaction
             createdTxs.signTransaction(ecKey);
+
+
             if(await this.addTransaction(createdTxs)){
                 this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
                 return true;
@@ -214,7 +220,7 @@ class CharityBlockChain{
                 ? constants.TRANSACTIONS_IN_BLOCK
                 : this.pendingTransactions.length;
                 console.log(spliceNumber);
-            this.transactionBuffer = this.pendingTransactions.splice(0, spliceNumber);//1
+            this.transactionBuffer = this.pendingTransactions.splice(0, spliceNumber);//1 //pendingtxs :5 => 1
             //console.log("after splice==============",this.pendingTransactions);
             console.info("Starting mining block...");
             const previousBlock = this.getLatestBlock();
@@ -232,7 +238,7 @@ class CharityBlockChain{
                 transactions: transactionsInBlock,
                 previousHash: previousBlock.hash,
                 difficulty: this.difficulty
-            }
+            }//mining service
             fork().send(blockObj);
             fork().on("message", (nonce) => {
               let block = new Block(blockObj.index,blockObj.timestamp,blockObj.transactions,
@@ -244,8 +250,8 @@ class CharityBlockChain{
     }
     mineBlock(block){
         this.blocksBuffer = block;
+        this.reset();//note 
         this.confirm++;
-        this.reset();
         console.log("Mined Successfully");
         let tempChain = this.getBlocks();
         tempChain.push(block);
@@ -330,6 +336,7 @@ class CharityBlockChain{
             const tempBlock = new Block(null,null,null,null,null,null,null);
             tempBlock.parseBlock(this.blocksBuffer);
             this.blocks.push(tempBlock);
+            //save database
             this.blocksBuffer = null;
             this.transactionBuffer = null;
             this.isConfirm = true;

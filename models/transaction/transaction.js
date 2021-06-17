@@ -7,7 +7,9 @@ const DonateProjectTransaction = require('./donate-project-transaction');
 const SendbackProjectTransaction = require('./sendback-project-transaction');
 class Transaction {
     constructor(type, data){
+        //transaction abstract : (type, data) => type => 
        this.type = type;
+       //this.data:
        if(type === "create"){
             this.data = new CreateProjectTransaction(null,null,null);
             //data.projectId, data.beneficiaryAddress, data.timestamp

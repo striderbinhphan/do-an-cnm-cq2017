@@ -4,8 +4,8 @@ const ec = new EC('secp256k1');
 class SendbackProjectTransaction{
     constructor(projectId, fromAddress, toAddress, amount, sendbackTimestamp) {
         this.projectId  = projectId; 
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
+        this.fromAddress = fromAddress;//projectOrganizationConfirmAddress
+        this.toAddress = toAddress;//projectBeneficiaryCreateAddress
         this.amount  = amount;
         this.sendbackTimestamp = sendbackTimestamp;
     }
@@ -33,6 +33,8 @@ class SendbackProjectTransaction{
         const publicKey  = ec.keyFromPublic(this.fromAddress,'hex');
         return publicKey.verify(this.calculateHash(),this.signature);
     }
+    // const Tx = new Transaction(data);
+    //tx. = =
     parseData(data) {
         this.projectId  = data.projectId; 
         this.fromAddress = data.fromAddress;
