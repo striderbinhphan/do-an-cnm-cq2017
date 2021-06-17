@@ -250,8 +250,8 @@ class CharityBlockChain{//blockchain services
     }
     mineBlock(block){
         this.blocksBuffer = block;
-        this.reset();//note 
         this.confirm++;
+        this.reset();//note 
         console.log("Mined Successfully");
         let tempChain = this.getBlocks();
         tempChain.push(block);
