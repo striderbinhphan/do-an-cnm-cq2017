@@ -13,6 +13,8 @@ const ec = new EC('secp256k1');
 const BlockChain =require('./models/blockchain');
 const Address = require('./models/address/address')
 const {transactions} = require('./utils/constants');
+const projectModel = require('./models/project/project.model');
+const transactionModel = require('./models/transaction/transaction.model');
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
@@ -181,6 +183,54 @@ app.post('/donate-projects',async (req,res)=>{
     res.json({status:"Donate project failed"}).end();
   }
 })
+
+app.get('/project/:id/transactions',async(req,res)=>{
+  const id = req.params.id;
+  const list = await transactionModel.transactionProject(id);
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list);
+
+})
+
+app.get('/project',async(req,res)=>{
+  const list = await projectModel.all();
+  res.json(list);
+})
+
+
+app.get('/project/:id',async(req,res)=>{
+  const id = req.params.id;
+  console.log('kieu cua id la');
+  console.log(typeof(id));
+  const list = await projectModel.detail(id);
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list);
+})
+
+// app.get('/project/:id/totaldonate',(req,res)=>{
+//   res.json()
+
+// })
+
+
+app.get('/transaction',async(req,res)=>{
+  const list = await transactionModel.all();
+  res.json(list);
+})
+
+app.get('/transaction/:id',async(req,res)=>{
+  const id = req.params.id;
+  const list = await transactionModel.detail(id);
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list);
+})
+
 
 io.on("connection", (socket) => {
   console.info(`Socket connected, ID: ${socket.id}`);
