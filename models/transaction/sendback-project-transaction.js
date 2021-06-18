@@ -16,11 +16,13 @@ class SendbackProjectTransaction{
         console.log("signing sendback transaction");
 
         if(senderEcKey.getPublic('hex') != this.fromAddress){
-            return 'You cannot sign transaction with another wallets!';
+            console.log('You cannot sign transaction with another wallets!')
+            return false;
         }
         const hashTx = this.calculateHash();
         const sig = senderEcKey.sign(hashTx,'base64');
         this.signature  = sig.toDER('hex');
+        return true;
     }
     isValidTransaction(){
         if(this.projectId  === null){

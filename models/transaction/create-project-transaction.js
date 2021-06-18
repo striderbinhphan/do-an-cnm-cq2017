@@ -14,11 +14,13 @@ class CreateProjectTransaction{
     signTransaction(beneficiaryEcKey) {
         console.log("Signing created Transaction");
         if(beneficiaryEcKey.getPublic('hex') != this.projectBeneficiaryCreateAddress){
-            return 'You cannot sign transaction with another wallets!';
+            console.log('You cannot sign transaction with another wallets!')
+            return false;
         }
         const hashTx = this.calculateHash();
         const sig = beneficiaryEcKey.sign(hashTx,'base64');
         this.signature  = sig.toDER('hex');
+        return true;
     }
     isValidTransaction(){
         if(this.projectId  === null){

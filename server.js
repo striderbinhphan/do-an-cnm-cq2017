@@ -140,9 +140,11 @@ app.post('/projects',async (req,res)=>{
   const createrEcKey = ec.keyFromPrivate(privateKey,'hex');
   
   if(await charityBlockChain.createProject(project,createrEcKey)){
-    return res.json({status:"Created project"}).end();
+    console.log("create success");
+    return res.send(201).end();
   }else{
-    return res.json({status:"failed"}).end();
+    console.log("create failed");
+    return res.send(200).end();
   }
 })
 app.get('/unconfirm-projects',(req,res)=>{

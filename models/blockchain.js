@@ -88,27 +88,30 @@ class CharityBlockChain{//blockchain services
     }
     async createProject(newProjectInfo,ecKey){
         if(!this.isExistingProjectByName(newProjectInfo.projectName)){
-            const projectTemp = new charityProject(null,null,null,null,null,null,null);
+            //vi project moi nen chua co id trong he thong
             newProjectInfo.projectId = this.projectList.length;
-            projectTemp.setInfo(newProjectInfo);
-            this.projectList.push(projectTemp);//luu database
-            //projectId
-            console.log("created Project:",projectTemp);
-            //console.log("project list",this.projectList);
-
+            //tao transactino create
             const createdTxs = new Transaction("create",newProjectInfo);//CreateProjectTransaction
-            createdTxs.signTransaction(ecKey);
-
-
-            if(await this.addTransaction(createdTxs)){
-                this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
-                return true;
-            } else{
-                console.log("This transaction is invalid(matched add & privateKey)");
-                this.projectList.splice(this.projectList.length -1, 1);
+            //kiem tra neu ky vao giao dich that bai
+            if(createdTxs.signTransaction(ecKey)){
+                if(await this.addTransaction(createdTxs)){
+                    this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
+                    const projectTemp = new charityProject(null,null,null,null,null,null,null);
+                    projectTemp.setInfo(newProjectInfo);
+                    this.projectList.push(projectTemp);//luu database
+                    //projectId
+                    console.log("created Project:",projectTemp);
+                    //console.log("project list",this.projectList);
+    
+                    return true;
+                } else{
+                    console.log("This transaction is invalid(matched add & privateKey)");
+                    return false;
+                }
+            }
+            else{
                 return false;
             }
-
         }
         else{
             console.log("This charity project has name which existing in our blockchain");
@@ -120,18 +123,22 @@ class CharityBlockChain{//blockchain services
         if(this.isExistingProjectById(projectInfo.projectId)&& this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress===null){
            
             const confirmTxs = new Transaction("confirm",projectInfo);
-            confirmTxs.signTransaction(confirmEcKey);
-            if(await this.addTransaction(confirmTxs)){ 
-                this.io.emit(transactions.ADD_TRANSACTION,confirmTxs);
-
-                this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress = confirmEcKey.getPublic('hex');
-                this.projectList[projectInfo.projectId].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
-
-                //delete projectTemp;
-                return true;
-            }else{
-                console.log("This transaction is invalid(matched add & privateKey)");
-
+            if(confirmTxs.signTransaction(confirmEcKey)){
+                if(await this.addTransaction(confirmTxs)){ 
+                    this.io.emit(transactions.ADD_TRANSACTION,confirmTxs);
+    
+                    this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress = confirmEcKey.getPublic('hex');
+                    this.projectList[projectInfo.projectId].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
+    
+                    //delete projectTemp;
+                    return true;
+                }else{
+                    console.log("This transaction is invalid(matched add & privateKey)");
+    
+                    return false;
+                }
+            }
+            else{
                 return false;
             }
         }
@@ -154,16 +161,22 @@ class CharityBlockChain{//blockchain services
         if(this.isExistingProjectById(donateInfo.projectId)){
            if(this.verifyDonateTimestamp(donateInfo.projectId,donateInfo.donateTimestamp)){
                 const donateTxs = new Transaction("donate",donateInfo);
-                donateTxs.signTransaction(donaterEcKey);
-                if(await this.addTransaction(donateTxs)){
-                    this.io.emit(transactions.ADD_TRANSACTION,donateTxs);
-                    
-                    return true;
-                } else{
-                    console.log("This transaction is invalid(matched add & privateKey)");
-
+                if(donateTxs.signTransaction(donaterEcKey)){
+                    if(await this.addTransaction(donateTxs)){
+                        console.log("donate transaction is made");
+                        this.io.emit(transactions.ADD_TRANSACTION,donateTxs);
+                        
+                        return true;
+                    } else{
+                        console.log("This transaction is invalid(matched add & privateKey)");
+    
+                        return false;
+                    }
+                }else{
+                    console("signing transaction fail");
                     return false;
                 }
+               
            }else{
                return false;
            }
@@ -185,14 +198,18 @@ class CharityBlockChain{//blockchain services
                 return false;
             }else{
                 const sendbackTxs = new Transaction("sendback",sendbackInfo);
-                sendbackTxs.signTransaction(orgaEcKey);
-                if(await this.addTransaction(sendbackTxs)){
-                    this.io.emit(transactions.ADD_TRANSACTION,sendbackTxs);
-                    return true;
-                } else{
-                console.log("This transaction is invalid(matched add & privateKey)");
+                if(sendbackTxs.signTransaction(orgaEcKey)){
+                    if(await this.addTransaction(sendbackTxs)){
+                        this.io.emit(transactions.ADD_TRANSACTION,sendbackTxs);
+                        return true;
+                    } else{
+                    console.log("This transaction is invalid(matched add & privateKey)");
+                        return false;
+                    }
+                }else{
                     return false;
                 }
+                
             }
         }
         else{

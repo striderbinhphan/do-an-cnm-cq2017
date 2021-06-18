@@ -14,12 +14,13 @@ class ConfirmProjectTransaction{
     signTransaction(organizationEcKey){
         console.log("signing confirm transaction");
         if(organizationEcKey.getPublic('hex') != this.projectOrganizationConfirmAddress){
-            console.log('You cannot sign transaction with another wallets!')
+            console.log('You cannot sign transaction with another wallets!');
             return false;
         }
         const hashTx = this.calculateHash();
         const sig = organizationEcKey.sign(hashTx,'base64');
         this.signature  = sig.toDER('hex');
+        return true;
     }
     isValidTransaction(){
         if(this.projectId  === null){
