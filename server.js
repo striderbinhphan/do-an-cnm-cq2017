@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const bodyParser = require("body-parser");
 const httpServer = require('http').Server(app);
 const io = require("socket.io")(httpServer);
@@ -16,6 +17,7 @@ const {transactions} = require('./utils/constants');
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
 app.use(logger('dev'));
+app.use(cors())
 
 const charityBlockChain = new BlockChain(io,null);
 var nodeList = [];
