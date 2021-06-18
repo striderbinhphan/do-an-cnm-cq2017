@@ -141,10 +141,10 @@ app.post('/projects',async (req,res)=>{
   
   if(await charityBlockChain.createProject(project,createrEcKey)){
     console.log("create success");
-    return res.send(201).end();
+    return res.status(201).end();
   }else{
     console.log("create failed");
-    return res.send(200).end();
+    return res.status(204).end();
   }
 })
 app.get('/unconfirm-projects',(req,res)=>{
@@ -159,9 +159,11 @@ app.post('/unconfirm-projects',async (req,res)=>{
   }
   const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
   if(await charityBlockChain.confirmProject(confirmData,confirmEcKey)){
-    res.json({status:"Confirm project success"}).end();
+    console.log("success");
+    res.status(201).end();
   }else{
-    res.json({status:"Confirm project failed"}).end();
+    console.log("fail");
+    res.status(204).end();
   }
 })
 app.get('/donate-projects',(req,res)=>{
@@ -180,9 +182,12 @@ app.post('/donate-projects',async (req,res)=>{
   }
   const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
   if(await charityBlockChain.donateProject(donateData,confirmEcKey)){
-    res.json({status:"Donate project success"}).end();
+    console.log("success");
+
+    res.status(201).end();
   }else{
-    res.json({status:"Donate project failed"}).end();
+    console.log("fail");
+    res.status(204).end();
   }
 })
 
