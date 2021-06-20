@@ -86,7 +86,14 @@ class CharityBlockChain{//blockchain services
     isExistingProjectById(projectId){
         return this.projectList.map(p=>p.projectId).includes(projectId);
     }
+    isExistingUser(projectBeneficiaryCreateAddress){
+        return this.addressList.map(u=>u.address).includes(projectBeneficiaryCreateAddress);
+    }
     async createProject(newProjectInfo,ecKey){
+        if(!this.isExistingUser(newProjectInfo.projectBeneficiaryCreateAddress)){
+            console.log("User address isn't existing in our system, pls register!");
+            return false;
+        }
         if(!this.isExistingProjectByName(newProjectInfo.projectName)){
             //vi project moi nen chua co id trong he thong
             newProjectInfo.projectId = this.projectList.length;
@@ -120,6 +127,10 @@ class CharityBlockChain{//blockchain services
     }
     //===========confirm project involved methods 
     async confirmProject(projectInfo,confirmEcKey){
+        if(!this.isExistingUser(newProjectInfo.projectOrganizationConfirmAddress)){
+            console.log("User address isn't existing in our system, pls register!");
+            return false;
+        }
         if(this.isExistingProjectById(projectInfo.projectId)&& this.projectList[projectInfo.projectId].projectOrganizationConfirmAddress===null){
            
             const confirmTxs = new Transaction("confirm",projectInfo);
@@ -158,6 +169,10 @@ class CharityBlockChain{//blockchain services
         }
     }
     async donateProject(donateInfo,donaterEcKey){
+        if(!this.isExistingUser(newProjectInfo.fromAddress)||!this.isExistingUser(newProjectInfo.toAddress)){
+            console.log("User address isn't existing in our system, pls register!");
+            return false;
+        }
         if(this.isExistingProjectById(donateInfo.projectId)){
            if(this.verifyDonateTimestamp(donateInfo.projectId,donateInfo.donateTimestamp)){
                 const donateTxs = new Transaction("donate",donateInfo);
@@ -189,6 +204,10 @@ class CharityBlockChain{//blockchain services
     }
      //============sending money from donate => organization or organization to beneficiary
     async sendbackProject(sendbackInfo,orgaEcKey){
+        if(!this.isExistingUser(newProjectInfo.fromAddress)||!this.isExistingUser(newProjectInfo.toAddress)){
+            console.log("User address isn't existing in our system, pls register!");
+            return false;
+        }
         if(this.isExistingProjectById(sendbackInfo.projectId)){
             if(this.projectList[sendbackInfo.projectId].projectOrganizationConfirmAddress!==sendbackInfo.fromAddress ||
                 this.projectList[sendbackInfo.projectId].projectBeneficiaryCreateAddress!==sendbackInfo.toAddress){
