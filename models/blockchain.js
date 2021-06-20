@@ -12,17 +12,24 @@ class CharityBlockChain{//blockchain services
     constructor(io, blocks){
         
         this.difficulty = 3;//dokho
+        this.io = io;//socketioserver
+
+
+
         this.blocks = [];//blocks
         this.pendingTransactions = [];//nhung transaction chua duoc mine
         this.addressList = [];//danh sach account trong blockchain
         this.projectList = []; //project in charityBlocckchain
         this.nodes = [];//node connecting
-        this.io = io;//socketioserver
+
+
         this.fetchBlocksData();
         this.fetchUsersData();
         // this.fetchProjectsData();
         // this.fetchNodesData();
         // this.fetchPendingTransactionData();
+        
+
         
         //mining variables
         this.transactionBuffer = null;//danh sach transaction chuan bi mine
