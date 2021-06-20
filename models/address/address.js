@@ -2,18 +2,20 @@ const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 //Description UserAddress in our blockchain
 class Address{
-    constructor(name,role){
+    constructor(name, email,role){
         
         this.name = name;
+        this.email = email;
         this.role = role;
-        this.privateKey = this.generateKeyPair(name,role);
+        this.privateKey = this.generateKeyPair(name, email, role);
     }
-    generateKeyPair(name, role){
+    generateKeyPair(name,email, role){
         const key = ec.genKeyPair();
         const publicKey = key.getPublic('hex');
         const privateKey = key.getPrivate('hex');
         this.address = publicKey;
         this.name = name;
+        this.email =email;
         this.role = role;
         return privateKey;
     }

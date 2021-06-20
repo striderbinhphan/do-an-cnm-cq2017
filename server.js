@@ -25,12 +25,16 @@ const charityBlockChain = new BlockChain(io,null);
 var nodeList = [];
 var status = false;
 app.post('/register',(req,res)=>{
-  const {name, role} = req.body;
-  const newUser = new Address(name,role);
+  const {name, email} = req.body;
+  const role = 'user';
+  console.log( email);
+  const newUser = new Address(name, email,role);
+  console.log(newUser);
   charityBlockChain.createUser(newUser);
   res.json({
-    status:"success",
     name:newUser.name,
+    email:newUser.email,
+    role: newUser.role,
     address: newUser.address,
     privateKey: newUser.privateKey
   }).end();
@@ -41,8 +45,8 @@ app.post('/login',(req,res)=>{
     if(ec.keyFromPrivate(privateKey,'hex').getPublic('hex')===publicKey){
         const payload = charityBlockChain.getUserInfo(publicKey);
       res.json({
-        status:"success",
         name: payload.name,
+        email: payload.email,
         role: payload.role,
         address: payload.address
     }).end();
@@ -201,10 +205,10 @@ app.get('/project/:id/transactions',async(req,res)=>{
 
 })
 
-app.get('/project',async(req,res)=>{
-  const list = await projectModel.all();
-  res.json(list);
-})
+// app.get('/project',async(req,res)=>{
+//   const list = await projectModel.all();
+//   res.json(list);
+// })
 
 
 app.get('/project/:id',async(req,res)=>{
