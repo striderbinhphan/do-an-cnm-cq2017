@@ -7,17 +7,29 @@ const ec = new EC('secp256k1');
 const fork = require('../utils/global');
 const {transactions, constants}  = require('../utils/constants');
 const {calculateHash, hashMatchesDifficulty, calculateHashFromBlock} = require('../utils/common-function');
+const blockchainModel = require('./blockchain.model');
 class CharityBlockChain{//blockchain services
     constructor(io, blocks){
         
         this.difficulty = 3;//dokho
-        this.blocks = blocks||[this.createGenesisBlock()];//blocks
+        this.io = io;//socketioserver
+
+
+
+        this.blocks = [];//blocks
         this.pendingTransactions = [];//nhung transaction chua duoc mine
-        this.addressList = this.createBaseOrganization();//danh sach account trong blockchain
+        this.addressList = [];//danh sach account trong blockchain
         this.projectList = []; //project in charityBlocckchain
         this.nodes = [];//node connecting
-        this.io = io;//socketioserver
+
+
+        this.fetchBlocksData();
+        this.fetchUsersData();
+        // this.fetchProjectsData();
+        // this.fetchNodesData();
+        // this.fetchPendingTransactionData();
         
+
         
         //mining variables
         this.transactionBuffer = null;//danh sach transaction chuan bi mine
@@ -27,30 +39,34 @@ class CharityBlockChain{//blockchain services
         this.confirm = 0 ;
         this.deny = 0;
     }
-    //common block chain involved methods
-    createGenesisBlock(){
-        return new Block(0,Date.parse('2021-10-06')/1000,'genesisTransactions','0',0,0,'genesisHash');
+    async fetchBlocksData(){
+        //doc du lieu block chain vao bien tam
+        const blocksFromDB =  await blockchainModel.all();
+        // const blockIndexList = blocksFromDB.map((b)=>b.block_index).map(async(index) =>{
+        //     const transactionInBlock = await blockchainModel.getTransactionByBlockIndex(index);
+        //     console.log(transactionInBlock);
+        // });
+        //console.log(blocksFromDB);
+        const blockIndexList = blocksFromDB.map(async(b) =>{
+            const transactionInBlock = await blockchainModel.getTransactionByBlockIndex(b.block_index);
+
+            const block = new Block(b.block_index,b.block_timestamp,transactionInBlock,b.block_previoushash,b.block_nonce,b.block_difficulty,b.block_hash);
+            //console.log(block);
+            this.blocks.push(block);
+        });
+        
+        //doc du lieu user vao bien tam
     }
-    createBaseOrganization(){
-        const baseOrganizations = [];
-        const or1 = {
-            name: 'Hoi chu thap do',
-            email: 'hctd@gmail.com',
-            role: 'organization',
-            address: '04f8d1e28efd7f3ddc40686cccc0b025597e192bf6aac9ada6bfda95848296a68da6a4e30f98aa340a90b05c30fca885acc1abfbd043116c4ed77f8903eb6ba489',
-            privateKey: '3fbb3fed684ae4e72f7248bb2d6d0c344f60e5682512e7232ec9f2faceeb3434'
-        };
-        const or2 =  {
-            name: 'Mac tran To quoc Viet Nam',
-            email: 'mttqvn@gmail.com',
-            role: 'organization',
-            address: '043357fbded6ac0519e19db7cead0d6579876ff4c274a776d50cfde9cfb60642bbacb1a323cf952f36f85fe24f0f220a067e9e52d3e61f37701e7e1f4a399722bf',
-            privateKey: 'aa97347d0e6d894fb7e74df806e86d5f48ada05e180fa1cf6b3791b14718b1c5'
-        }
-        baseOrganizations.push(or1);
-        baseOrganizations.push(or2);
-        console.log(baseOrganizations);
-        return baseOrganizations;
+    //common block chain involved methods
+    //  createGenesisBlock(){
+    //     // const txsInBlock = await blockchainModel.getTransactionByBlockIndex(0);
+    //     // console.log(txsInBlock);
+    //     return new Block(0,Date.parse('2021-10-06')/1000,'genesisTransactions','0',0,0,'genesisHash');
+    // }
+    async fetchUsersData(){
+        const userList = await blockchainModel.getUserList();
+        console.log(userList);
+        userList.map(u=>this.addressList.push(u));
     }
     getLatestBlock(){
         return this.blocks[this.blocks.length -1];
@@ -91,8 +107,9 @@ class CharityBlockChain{//blockchain services
         this.nodes.push(node);
     }
     //=============create new User  involved methods
-    createUser(newUser){
+    async createUser(newUser){
         this.addressList.push(newUser);
+        return await blockchainModel.addNewUser(newUser);
         //console.log("added new User:" ,newUser);
     }   
     isUserExisting(publicKey){
@@ -131,7 +148,10 @@ class CharityBlockChain{//blockchain services
                     this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
                     const projectTemp = new charityProject(null,null,null,null,null,null,null);
                     projectTemp.setInfo(newProjectInfo);
-                    this.projectList.push(projectTemp);//luu database
+                    this.projectList.push(projectTemp);
+                    //=================luu database project
+                    //blockchainModel.addNewProject(newProject);
+
                     //projectId
                     console.log("created Project:",projectTemp);
                     //console.log("project list",this.projectList);

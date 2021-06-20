@@ -28,10 +28,16 @@ var status = false;
 app.post('/register',(req,res)=>{
   const {name, email} = req.body;
   const role = 'user';
-  console.log( email);
+  //console.log( email);
   const newUser = new Address(name, email,role);
-  console.log(newUser);
-  charityBlockChain.createUser(newUser);
+  const userToSave = {
+    address: newUser.address,
+    name: newUser.name,
+    email: newUser.email,
+    role: newUser.role
+  }
+  console.log(userToSave);
+  charityBlockChain.createUser(userToSave);
   res.json({
     name:newUser.name,
     email:newUser.email,
@@ -58,9 +64,9 @@ app.post('/login',(req,res)=>{
     res.json({status:"This address isn't exist! please register"}).end();
   }
 })
-// app.get('/users',(req,res)=>{
-//   return res.json(charityBlockChain.getUserList()).end();
-// })
+app.get('/users',(req,res)=>{
+  return res.json(charityBlockChain.getUserList()).end();
+})
 app.post("/nodes", (req, res) => {
     const { host } = req.body;
     const { callback, nodeLength } = req.query;
@@ -265,7 +271,10 @@ app.post('/sendback-projects',async (req,res)=>{
 })
 
 
-
+app.get('/fetch',async (req,res)=>{
+  const list = await charityBlockChain.fetchData();
+  res.json(list).end();
+})
 
 io.on("connection", (socket) => {
   console.info(`Socket connected, ID: ${socket.id}`);
