@@ -197,7 +197,6 @@ app.post('/donate-projects',async (req,res)=>{
     res.status(204).end();
   }
 })
-
 app.get('/project/:id/transactions',async(req,res)=>{
   const id = req.params.id;
   const list = await transactionModel.transactionProject(id);
@@ -216,8 +215,6 @@ app.get('/project/:id/transactions',async(req,res)=>{
 
 app.get('/project/:id',async(req,res)=>{
   const id = req.params.id;
-  console.log('kieu cua id la');
-  console.log(typeof(id));
   const list = await projectModel.detail(id);
   if (list.length === 0) {
     return res.status(204).end();
@@ -227,7 +224,6 @@ app.get('/project/:id',async(req,res)=>{
 
 // app.get('/project/:id/totaldonate',(req,res)=>{
 //   res.json()
-
 // })
 
 
@@ -244,6 +240,30 @@ app.get('/transaction/:id',async(req,res)=>{
   }
   res.json(list);
 })
+
+app.post('/sendback-projects',async (req,res)=>{
+  const {projectId, amount, privateKey}  = req.body;
+  const toBeneficiaryAddress = charityBlockChain.getBeneficiaryAddressFromProjectId(projectId);
+  const fromAddress = charityBlockChain.getOrganizationConfirmAddressFromProjectId(projectId);
+  const sendbackInfo  = {
+    projectId,
+    fromAddress,
+    toAddress: toBeneficiaryAddress,
+    amount,
+    donateTimestamp: new Date().getTime()//ms,
+  }
+  const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
+  if(await charityBlockChain.sendbackProject(sendbackInfo,confirmEcKey)){
+    console.log("success");
+
+    res.status(201).end();
+  }else{
+    console.log("fail");
+    res.status(204).end();
+  }
+})
+
+
 
 
 io.on("connection", (socket) => {
