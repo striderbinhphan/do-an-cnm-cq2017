@@ -57,6 +57,9 @@ app.post('/login',(req,res)=>{
     res.json({status:"This address isn't exist! please register"}).end();
   }
 })
+// app.get('/users',(req,res)=>{
+//   return res.json(charityBlockChain.getUserList()).end();
+// })
 app.post("/nodes", (req, res) => {
     const { host } = req.body;
     const { callback, nodeLength } = req.query;
