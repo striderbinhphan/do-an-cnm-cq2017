@@ -6,8 +6,8 @@ use blockchain;
 --
 
 CREATE TABLE `users` (
-  `address` varchar(45) NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
+  `address` varchar(256) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `email` varchar(256) default null,
   `role` varchar(45) DEFAULT NULL, 
   PRIMARY KEY (`address`)
@@ -22,7 +22,7 @@ CREATE TABLE `users` (
 
 
 CREATE TABLE `project` (
-  `project_id` int(5) NOT NULL,
+  `project_id` int NOT NULL,
   `project_name` varchar(256) not  NULL,
   `project_beneficiary_create_address` varchar(256) DEFAULT NULL,
 	`project_organization_confirm_address` varchar(256) DEFAULT NULL,
@@ -54,9 +54,9 @@ CREATE TABLE `blocks` (
 --
 
 CREATE TABLE `transaction` (
-  `transaction_id` int(5) NOT NULL auto_increment,
-  `transaction_type` varchar(10) NOT NULL,
-  `project_id` int(5) DEFAULT NULL,
+  `transaction_id` int NOT NULL,
+  `transaction_type` varchar(20) NOT NULL,
+  `project_id` int DEFAULT NULL,
   `block_index` int not null,
   
   `create_txs_project_beneficiary_create_address` varchar(256) DEFAULT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE `transaction` (
 
 CREATE TABLE `nodes` (
   `node_index` varchar(45) NOT NULL,
-  `host` varchar(45) DEFAULT NULL,
+  `host` varchar(256) DEFAULT NULL,
   `port` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`node_index`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -104,8 +104,8 @@ CREATE TABLE `nodes` (
 --
 
 CREATE TABLE `pending_transactions` (
-  `transaction_type` varchar(10) NOT NULL,
-  `project_id` varchar(45) DEFAULT NULL,
+  `transaction_type` varchar(20) NOT NULL,
+  `project_id` int DEFAULT NULL,
   
   `create_txs_project_beneficiary_create_address` varchar(256) DEFAULT NULL,
   `create_txs_projectCreateTimestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -129,5 +129,14 @@ insert into `project` values (0,'genesis','genesis','genesis','2021-01-01','2021
 insert into `blocks` values(0,'2021-01-01',"genesisHash","genesispreviousHash",0,0);
 insert into `transaction` values(0,'genesis',0,0, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01');
 
-DELETE FROM `blocks`
-WHERE `block_index`=0; 
+
+insert into `transaction` values(1,'genesis',0,0, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01');
+
+
+insert into `project` values (1,'genesis','genesis','genesis','2021-01-01','2021-01-01','2021-01-01');
+insert into `blocks` values(1,'2021-01-01',"genesisHash","genesispreviousHash",0,0);
+insert into `transaction` values(2,'genesis',0,1, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01');
+
+ 
+insert into `users` values ('04f8d1e28efd7f3ddc40686cccc0b025597e192bf6aac9ada6bfda95848296a68da6a4e30f98aa340a90b05c30fca885acc1abfbd043116c4ed77f8903eb6ba489','Hoi chu thap do','hctd@gmail.com','organization');
+insert into `users` values ('043357fbded6ac0519e19db7cead0d6579876ff4c274a776d50cfde9cfb60642bbacb1a323cf952f36f85fe24f0f220a067e9e52d3e61f37701e7e1f4a399722bf','Mat tran To quoc Viet Nam','mttqvn@gmail.com','organization');
