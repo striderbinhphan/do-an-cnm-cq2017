@@ -13,8 +13,9 @@ const ec = new EC('secp256k1');
 const BlockChain =require('./models/blockchain');
 const Address = require('./models/address/address')
 const {transactions} = require('./utils/constants');
-const projectModel = require('./models/project/project.model');
-const transactionModel = require('./models/transaction/transaction.model');
+//const projectModel = require('./models/project/project.model');
+//const transactionModel = require('./models/transaction/transaction.model');
+const blockchainModel = require('./models/blockchain.model');
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
@@ -198,6 +199,8 @@ app.post('/donate-projects',async (req,res)=>{
   }
 })
 
+
+
 app.get('/project/:id/transactions',async(req,res)=>{
   const id = req.params.id;
   const list = await transactionModel.transactionProject(id);
@@ -245,7 +248,14 @@ app.get('/transaction/:id',async(req,res)=>{
   res.json(list);
 })
 
-
+//test
+app.get('/blockchain',async (req,res)=>{
+  const list = await blockchainModel.all();
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list).end();
+})
 io.on("connection", (socket) => {
   console.info(`Socket connected, ID: ${socket.id}`);
 
