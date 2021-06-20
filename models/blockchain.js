@@ -75,6 +75,11 @@ class CharityBlockChain{//blockchain services
         console.log()
         return this.projectList[projectId].projectOrganizationConfirmAddress;
     }
+    getBeneficiaryAddressFromProjectId(projectId){
+
+        return this.projectList[projectId].projectBeneficiaryCreateAddress;
+    }
+
     getUserList(){
         return this.addressList;
     }
