@@ -25,9 +25,9 @@ class CharityBlockChain{//blockchain services
 
         this.fetchBlocksData();
         this.fetchUsersData();
-        // this.fetchProjectsData();
-        // this.fetchNodesData();
-        // this.fetchPendingTransactionData();
+        this.fetchProjectsData();
+        //this.fetchNodesData();
+        this.fetchPendingTransactionData();
         
 
         
@@ -68,6 +68,19 @@ class CharityBlockChain{//blockchain services
         console.log(userList);
         userList.map(u=>this.addressList.push(u));
     }
+
+    async fetchProjectsData(){
+        const projectList = await blockchainModel.getProjectList();
+        console.log(projectList);
+        projectList.map(p=>this.projectId.push(p));
+    }
+
+    // async fetchPendingTransactionData(){
+    //     const pendingTransactionsList = await blockchainModel.getPendingTransactions();
+    //     console.log(pendingTransactionsList);
+    //     pendingTransactionsList.map(c=> this.pendingTransactions.push(c));
+    // }
+
     getLatestBlock(){
         return this.blocks[this.blocks.length -1];
     }
@@ -104,7 +117,8 @@ class CharityBlockChain{//blockchain services
     }
     //====blockchain methods control
     addNode(node) {
-        this.nodes.push(node);
+        this.nodes.push(newNode);
+        blockchainModel.addNode(newNode);
     }
     //=============create new User  involved methods
     async createUser(newUser){
@@ -150,12 +164,10 @@ class CharityBlockChain{//blockchain services
                     projectTemp.setInfo(newProjectInfo);
                     this.projectList.push(projectTemp);
                     //=================luu database project
-                    //blockchainModel.addNewProject(newProject);
-
+                    blockchainModel.addProject(projectTemp);
                     //projectId
                     console.log("created Project:",projectTemp);
                     //console.log("project list",this.projectList);
-                    
                     return true;
                 } else{
                     console.log("This transaction is invalid(matched add & privateKey)");
