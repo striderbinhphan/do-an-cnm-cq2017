@@ -16,6 +16,7 @@ const {transactions} = require('./utils/constants');
 //const projectModel = require('./models/project/project.model');
 //const transactionModel = require('./models/transaction/transaction.model');
 const blockchainModel = require('./models/blockchain.model');
+const { getTransactionByID } = require('./models/blockchain.model');
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
@@ -204,9 +205,11 @@ app.post('/donate-projects',async (req,res)=>{
     res.status(204).end();
   }
 })
+
+
 app.get('/project/:id/transactions',async(req,res)=>{
-  const id = req.params.id;
-  const list = await transactionModel.transactionProject(id);
+  const id = +req.params.id;
+  const list = await blockchainModel.getTransactionByProjectID(id);
   if (list.length === 0) {
     return res.status(204).end();
   }
@@ -214,39 +217,59 @@ app.get('/project/:id/transactions',async(req,res)=>{
 
 })
 
-// app.get('/project',async(req,res)=>{
-//   const list = await projectModel.all();
-//   res.json(list);
-// })
+
+
 
 
 app.get('/project/:id',async(req,res)=>{
-  const id = req.params.id;
-  const list = await projectModel.detail(id);
+  const id = +req.params.id;
+  const list = await blockchainModel.getProjectByID(id);
   if (list.length === 0) {
     return res.status(204).end();
   }
   res.json(list);
 })
-
-// app.get('/project/:id/totaldonate',(req,res)=>{
-//   res.json()
-// })
-
-
-app.get('/transaction',async(req,res)=>{
-  const list = await transactionModel.all();
-  res.json(list);
-})
-
 app.get('/transaction/:id',async(req,res)=>{
-  const id = req.params.id;
-  const list = await transactionModel.detail(id);
+  const id = +req.params.id;
+  const list = await getTransactionByID(id);
   if (list.length === 0) {
     return res.status(204).end();
   }
   res.json(list);
 })
+
+app.get('/project/:id/totaldonate',async(req,res)=>{
+  const id=+req.params.id;
+  const ret = await blockchainModel.getTotalDonateByProjectID(id);
+  if(ret[0].totaldonate===null){
+    result={
+      totaldonate:0,
+    }
+    res.json(result)
+  } 
+
+  result={
+    totaldonate:+ret[0].totaldonate,
+  }
+  res.json(result);
+})
+
+app.get('/project/:id/totalSendBack',async(req,res)=>{
+  const id=+req.params.id;
+  const ret = await blockchainModel.getTotalSendBackByProjectID(id);
+  if(ret[0].totalsendback===null){
+    result={
+      totalsendback:0,
+    }
+    res.json(result)
+  } 
+
+  result={
+    totalsendback:+ret[0].totalsendback,
+  }
+  res.json(result);
+})
+
 
 app.post('/sendback-projects',async (req,res)=>{
   const {projectId, amount, privateKey}  = req.body;
