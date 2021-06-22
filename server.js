@@ -181,6 +181,7 @@ app.post('/unconfirm-projects',async (req,res)=>{
     res.status(204).end();
   }
 })
+
 app.get('/donate-projects',(req,res)=>{
   res.json(charityBlockChain.getDonateProjectList()).end();
 })
@@ -206,6 +207,34 @@ app.post('/donate-projects',async (req,res)=>{
   }
 })
 
+
+app.get('/senback-projects/:organizationAddress',(req,res)=>{
+  const organizationAddress = req.params;
+  res.json(charityBlockChain.getSendbackProjectList(organizationAddress)).end();
+})
+
+
+app.post('/sendback-projects',async (req,res)=>{
+  const {projectId, amount, privateKey}  = req.body;
+  const toBeneficiaryAddress = charityBlockChain.getBeneficiaryAddressFromProjectId(projectId);
+  const fromAddress = charityBlockChain.getOrganizationConfirmAddressFromProjectId(projectId);
+  const sendbackInfo  = {
+    projectId,
+    fromAddress,
+    toAddress: toBeneficiaryAddress,
+    amount,
+    donateTimestamp: new Date().getTime()//ms,
+  }
+  const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
+  if(await charityBlockChain.sendbackProject(sendbackInfo,confirmEcKey)){
+    console.log("success");
+
+    res.status(201).end();
+  }else{
+    console.log("fail");
+    res.status(204).end();
+  }
+})
 
 app.get('/project/:id/transactions',async(req,res)=>{
   const id = +req.params.id;
@@ -270,28 +299,6 @@ app.get('/project/:id/totalSendBack',async(req,res)=>{
   res.json(result);
 })
 
-
-app.post('/sendback-projects',async (req,res)=>{
-  const {projectId, amount, privateKey}  = req.body;
-  const toBeneficiaryAddress = charityBlockChain.getBeneficiaryAddressFromProjectId(projectId);
-  const fromAddress = charityBlockChain.getOrganizationConfirmAddressFromProjectId(projectId);
-  const sendbackInfo  = {
-    projectId,
-    fromAddress,
-    toAddress: toBeneficiaryAddress,
-    amount,
-    donateTimestamp: new Date().getTime()//ms,
-  }
-  const confirmEcKey = ec.keyFromPrivate(privateKey,'hex');
-  if(await charityBlockChain.sendbackProject(sendbackInfo,confirmEcKey)){
-    console.log("success");
-
-    res.status(201).end();
-  }else{
-    console.log("fail");
-    res.status(204).end();
-  }
-})
 
 
 app.get('/fetch',async (req,res)=>{

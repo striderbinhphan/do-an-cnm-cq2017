@@ -87,6 +87,10 @@ class CharityBlockChain{//blockchain services
         const currentDate = new Date().getTime();
         return this.projectList.filter(c=>(c.projectOrganizationConfirmAddress!==null&&c.projectDeadline>=currentDate));
     }
+    getSendbackProjectList(organizationAddress){
+        const currentDate = new Date().getTime();
+        return this.projectList.filter(c=>(c.projectOrganizationConfirmAddress===organizationAddress&&currentDate>=c.projectDeadline));
+    }
     getOrganizationConfirmAddressFromProjectId(projectId){
         console.log()
         return this.projectList[projectId].projectOrganizationConfirmAddress;
@@ -173,7 +177,7 @@ class CharityBlockChain{//blockchain services
     }
     //===========confirm project involved methods 
     async confirmProject(projectInfo,confirmEcKey){
-        if(!this.isExistingUser(newProjectInfo.projectOrganizationConfirmAddress)){
+        if(!this.isExistingUser(projectInfo.projectOrganizationConfirmAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
@@ -215,7 +219,7 @@ class CharityBlockChain{//blockchain services
         }
     }
     async donateProject(donateInfo,donaterEcKey){
-        if(!this.isExistingUser(newProjectInfo.fromAddress)||!this.isExistingUser(newProjectInfo.toAddress)){
+        if(!this.isExistingUser(donateInfo.fromAddress)||!this.isExistingUser(newProjectInfo.toAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
@@ -250,7 +254,7 @@ class CharityBlockChain{//blockchain services
     }
      //============sending money from donate => organization or organization to beneficiary
     async sendbackProject(sendbackInfo,orgaEcKey){
-        if(!this.isExistingUser(newProjectInfo.fromAddress)||!this.isExistingUser(newProjectInfo.toAddress)){
+        if(!this.isExistingUser(sendbackInfo.fromAddress)||!this.isExistingUser(sendbackInfo.toAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
