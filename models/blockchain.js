@@ -26,8 +26,8 @@ class CharityBlockChain{//blockchain services
         this.fetchBlocksData();
         this.fetchUsersData();
         this.fetchProjectsData();
-        //this.fetchNodesData();
-        this.fetchPendingTransactionData();
+        this.fetchNodesData();
+        //this.fetchPendingTransactionData();
         
 
         
@@ -65,14 +65,20 @@ class CharityBlockChain{//blockchain services
     // }
     async fetchUsersData(){
         const userList = await blockchainModel.getUserList();
-        console.log(userList);
+        //console.log(userList);
         userList.map(u=>this.addressList.push(u));
     }
 
     async fetchProjectsData(){
         const projectList = await blockchainModel.getProjectList();
-        console.log(projectList);
+        //console.log(projectList);
         projectList.map(p=>this.projectId.push(p));
+    }
+
+    async fetchNodesData(){
+        const nodeList = await blockchainModel.getNodeList();
+        //console.log(nodeList);
+        nodeList.map(n=>this.nodes.push(n));
     }
 
     // async fetchPendingTransactionData(){
@@ -107,6 +113,10 @@ class CharityBlockChain{//blockchain services
     getBeneficiaryAddressFromProjectId(projectId){
 
         return this.projectList[projectId].projectBeneficiaryCreateAddress;
+    }
+
+    getNodeList(){
+        return this.nodes;
     }
 
     getUserList(){

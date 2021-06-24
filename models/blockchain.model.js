@@ -7,6 +7,7 @@ module.exports = {
   //transaction model
   getTransactionByBlockIndex(index){
     return db('transaction').where('block_index',index);
+  
   },
 
   //user model 
@@ -15,5 +16,28 @@ module.exports = {
   },
   addNewUser(newUser){
     return db('users').insert(newUser);
+  },
+
+  //project model
+  getProjectList(){
+    return db('project');
+  },
+  addProject(projectTemp)
+  {
+    return db('project').insert(projectTemp);
+  },
+
+  //node model
+
+  getNodeList(){
+    return db('nodes');
+  },
+  
+  addNode(newNode)
+  {
+    return db('nodes'),insert(newNode);
   }
+
+  //pendingTransaction model
+  
 };
