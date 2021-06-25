@@ -13,4 +13,25 @@ const hashMatchesDifficulty = (hash,difficulty) =>{
 const calculateHashFromBlock = (block)=>{
     return SHA256(block.index+block.timestamp+JSON.stringify(block.transactions)+block.previousHash+block.nonce+block.difficulty).toString();
 };
-module.exports = {calculateHash,hashMatchesDifficulty,calculateHashFromBlock};
+const getFormattedDate = (date)=>{
+    if(date===null || date === undefined){
+        var d = new Date();
+
+        d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) + "-" + ('0' + d.getDate()).slice(-2) + " " + ('0' + d.getHours()).slice(-2) + ":" + ('0' + d.getMinutes()).slice(-2) + ":" + ('0' + d.getSeconds()).slice(-2);
+
+        return d;
+    }
+    else{
+        var d = new Date(date);
+
+        d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) + "-" + ('0' + d.getDate()).slice(-2) + " " + ('0' + d.getHours()).slice(-2) + ":" + ('0' + d.getMinutes()).slice(-2) + ":" + ('0' + d.getSeconds()).slice(-2);
+
+        return d;
+   }
+}
+const getTimestamp = (date) =>{
+    return new Date(date).getTime();
+}
+module.exports = {calculateHash,hashMatchesDifficulty,calculateHashFromBlock, getFormattedDate, getTimestamp};
+
+
