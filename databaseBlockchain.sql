@@ -27,9 +27,9 @@ CREATE TABLE `project` (
   `project_beneficiary_create_address` varchar(256) DEFAULT NULL,
 	`project_organization_confirm_address` varchar(256) DEFAULT NULL,
     `project_description` varchar(256) DEFAULT NULL,
-    `project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `project_deadline` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
+  `project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
+  `project_deadline` timestamp DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`project_id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -40,7 +40,7 @@ CREATE TABLE `project` (
 
 CREATE TABLE `blocks` (
   `block_index` int NOT NULL auto_increment,
-  `block_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `block_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   `block_hash` varchar(256) DEFAULT NULL,
   `block_previoushash` varchar(256) DEFAULT NULL,
   `block_nonce` int DEFAULT NULL,
@@ -60,20 +60,20 @@ CREATE TABLE `transaction` (
   `project_id` int DEFAULT NULL,
   `block_index` int not null,
   `create_txs_project_beneficiary_create_address` varchar(256) DEFAULT NULL,
-  `create_txs_project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_txs_project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
   `confirm_txs_project_organization_confirm_address` varchar(256) DEFAULT NULL,
-  `confirm_txs_project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `confirm_txs_project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
   `donate_txs_from_address` varchar(256) DEFAULT NULL,
   `donate_txs_to_address` varchar(256) DEFAULT NULL,
   `donate_txs_amount` int default null,
-  `donate_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `donate_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
    `sendback_txs_from_address` varchar(256) DEFAULT NULL,
   `sendback_txs_to_address` varchar(256) DEFAULT NULL,
   `sendback_txs_amount` int default null,
-  `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
    `transaction_signature` varchar(256) default null,
   PRIMARY KEY (`transaction_id`),
@@ -110,20 +110,20 @@ CREATE TABLE `pending_transactions` (
   
   
   `create_txs_project_beneficiary_create_address` varchar(256) DEFAULT NULL,
-  `create_txs_project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_txs_project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
   `confirm_txs_project_organization_confirm_address` varchar(256) DEFAULT NULL,
-  `confirm_txs_project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `confirm_txs_project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
   `donate_txs_from_address` varchar(256) DEFAULT NULL,
   `donate_txs_to_address` varchar(256) DEFAULT NULL,
   `donate_txs_amount` int default null,
-  `donate_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `donate_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   
    `sendback_txs_from_address` varchar(256) DEFAULT NULL,
   `sendback_txs_to_address` varchar(256) DEFAULT NULL,
   `sendback_txs_amount` int default null,
-  `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   `transaction_signature` varchar(256) default null
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
