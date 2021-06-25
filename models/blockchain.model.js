@@ -11,6 +11,7 @@ module.exports = {
   //transaction model
   getTransactionByBlockIndex(index){
     return db('transaction').where('block_index',index);
+  
   },
         //add transaction in blocks to transaction table
   addTransactionInBlock(transaction){
@@ -64,4 +65,7 @@ module.exports = {
   deletePendingTransactionBySignature(signature){
     return db('pending_transactions').where('transaction_signature',signature).del();
   }
+
+  //pendingTransaction model
+  
 };

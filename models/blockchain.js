@@ -249,6 +249,10 @@ class CharityBlockChain{//blockchain services
         return this.nodes;
     }
 
+    getNodeList(){
+        return this.nodes;
+    }
+
     getUserList(){
         return this.addressList;
     }
