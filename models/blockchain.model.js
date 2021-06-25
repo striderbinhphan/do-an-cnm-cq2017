@@ -13,6 +13,26 @@ module.exports = {
     return db('transaction').where('block_index',index);
   
   },
+  getTransactionByProjectID(projectID){
+    return db('transaction').where('project_id',projectID);
+  },
+  getDonateTransactionByProjectID(projectID){
+    return db('transaction').where('project_id',projectID).where('transaction_type',"donate");
+  },
+  getSendbackTransactionByProjectID(projectID){
+    return db('transaction').where('project_id',projectID).where('transaction_type',"sendback");
+  },
+  getTransactionByID(transactionID){
+    return db('transaction').where('transaction_id',transactionID);
+  },
+  getTotalDonateByProjectID(projectID){
+    return db('transaction').sum('donate_txs_amount as totaldonate').where('project_id',projectID).where('transaction_type',"donate");
+  },
+  getTotalSendBackByProjectID(projectID){
+    return db('transaction').sum('sendback_txs_amount as totalsendback').where('project_id',projectID).where('transaction_type',"sendback");
+  },
+
+
         //add transaction in blocks to transaction table
   addTransactionInBlock(transaction){
     return db('transaction').insert(transaction);
@@ -23,6 +43,9 @@ module.exports = {
   },
   addNewUser(newUser){
     return db('users').insert(newUser);
+  },
+  getUserByAddress(address){
+    return db('users').where('address',address);
   },
 
   //project model
@@ -42,6 +65,10 @@ module.exports = {
       project_confirm_timestamp: timestamp
     })
   },
+  getProjectByID(projectID){
+    return db('project').where('project_id',projectID);
+ },
+
   //node model
 
   getNodeList(){
