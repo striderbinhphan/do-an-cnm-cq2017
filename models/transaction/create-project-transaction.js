@@ -2,10 +2,11 @@ const SHA256 = require("crypto-js/sha256");
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 class CreateProjectTransaction{
-    constructor(projectId,projectBeneficiaryCreateAddress, projectCreateTimestamp){
+    constructor(projectId,projectBeneficiaryCreateAddress, projectCreateTimestamp, signature){
         this.projectId = projectId;
         this.projectBeneficiaryCreateAddress = projectBeneficiaryCreateAddress;
         this.projectCreateTimestamp = projectCreateTimestamp;
+        this.signature = null || signature;
     }
 
     calculateHash(){
@@ -37,6 +38,7 @@ class CreateProjectTransaction{
         this.projectId = data.projectId;
         this.projectBeneficiaryCreateAddress = data.projectBeneficiaryCreateAddress;
         this.projectCreateTimestamp = data.projectCreateTimestamp;
+        this.signature = data.signature ||null;
     }
 }
 module.exports = CreateProjectTransaction;

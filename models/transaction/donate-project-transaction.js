@@ -2,12 +2,13 @@ const SHA256 = require("crypto-js/sha256");
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 class DonateTransaction{
-    constructor(projectId, fromAddress, toAddress, amount, donateTimestamp) {
+    constructor(projectId, fromAddress, toAddress, amount, donateTimestamp,signature) {
         this.projectId  = projectId; 
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount  = amount;
         this.donateTimestamp = donateTimestamp;
+        this.signature = null || signature;
     }
     calculateHash(){
         return SHA256(this.projectId + this.fromAddress+this.toAddress+this.amount+this.donateTimestamp).toString();
@@ -41,6 +42,7 @@ class DonateTransaction{
         this.toAddress = data.toAddress;
         this.amount  = data.amount;
         this.donateTimestamp = data.donateTimestamp;
+        this.signature = data.signature ||null;
     }
 }
 module.exports = DonateTransaction;

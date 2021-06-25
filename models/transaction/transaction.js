@@ -11,7 +11,7 @@ class Transaction {
        this.type = type;
        //this.data:
        if(type === "create"){
-            this.data = new CreateProjectTransaction(null,null,null);
+            this.data = new CreateProjectTransaction(null,null,null,null);
             //data.projectId, data.beneficiaryAddress, data.timestamp
             if(data!==null){
                 this.data.parseData(data);
@@ -20,7 +20,7 @@ class Transaction {
         }
         if(type==="confirm"){
            
-            this.data = new ConfirmProjectTransaction(null,null,null,null);
+            this.data = new ConfirmProjectTransaction(null,null,null,null,null);
             //data.projectId, data.beneficiaryAddress, data.timestamp
             if(data!==null){
                 this.data.parseData(data);
@@ -28,7 +28,7 @@ class Transaction {
             
         }
         if(type==="donate"){
-            this.data = new DonateProjectTransaction(null,null,null,null,null);
+            this.data = new DonateProjectTransaction(null,null,null,null,null,null);
             if(data!==null){
                 this.data.parseData(data);
             }
@@ -36,7 +36,7 @@ class Transaction {
         }
 
         if(type==="sendback"){
-            this.data = new SendbackProjectTransaction(null,null,null,null,null);
+            this.data = new SendbackProjectTransaction(null,null,null,null,null,null);
             if(data!==null){
                 this.data.parseData(data);
             }
@@ -54,7 +54,7 @@ class Transaction {
     parseData(txData){
         this.type = txData.type;
         if(txData.type === "create"){
-             this.data = new CreateProjectTransaction(null,null,null);
+             this.data = new CreateProjectTransaction(null,null,null,null);
              //data.projectId, data.beneficiaryAddress, data.timestamp
              if(txData.data!==null){
                  this.data.parseData(txData.data);
@@ -63,7 +63,7 @@ class Transaction {
          }
          if(txData.type==="confirm"){
             
-             this.data = new ConfirmProjectTransaction(null,null,null,null);
+             this.data = new ConfirmProjectTransaction(null,null,null,null,null);
              //data.projectId, data.beneficiaryAddress, data.timestamp
              if(txData.data!==null){
                  this.data.parseData(txData.data);
@@ -71,7 +71,7 @@ class Transaction {
              
          }
          if(txData.type==="donate"){
-             this.data = new DonateProjectTransaction(null,null,null,null,null);
+             this.data = new DonateProjectTransaction(null,null,null,null,null,null);
              if(txData.data!==null){
                  this.data.parseData(txData.data);
              }
@@ -79,7 +79,7 @@ class Transaction {
          }
  
          if(txData.type==="sendback"){
-             this.data = new SendbackProjectTransaction(null,null,null,null,null);
+             this.data = new SendbackProjectTransaction(null,null,null,null,null,null);
              if(txData.data!==null){
                  this.data.parseData(txData.data);
              }
