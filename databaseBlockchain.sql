@@ -22,10 +22,11 @@ CREATE TABLE `users` (
 
 
 CREATE TABLE `project` (
-  `project_id` int NOT NULL,
+  `project_id` int NOT NULL auto_increment,
   `project_name` varchar(256) not  NULL,
   `project_beneficiary_create_address` varchar(256) DEFAULT NULL,
 	`project_organization_confirm_address` varchar(256) DEFAULT NULL,
+    `project_description` varchar(256) DEFAULT NULL,
     `project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `project_deadline` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -38,7 +39,7 @@ CREATE TABLE `project` (
 --
 
 CREATE TABLE `blocks` (
-  `block_index` int NOT NULL,
+  `block_index` int NOT NULL auto_increment,
   `block_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `block_hash` varchar(256) DEFAULT NULL,
   `block_previoushash` varchar(256) DEFAULT NULL,
@@ -54,11 +55,10 @@ CREATE TABLE `blocks` (
 --
 
 CREATE TABLE `transaction` (
-  `transaction_id` int NOT NULL,
+  `transaction_id` int NOT NULL auto_increment,
   `transaction_type` varchar(20) NOT NULL,
   `project_id` int DEFAULT NULL,
   `block_index` int not null,
-  
   `create_txs_project_beneficiary_create_address` varchar(256) DEFAULT NULL,
   `create_txs_project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   
@@ -75,6 +75,7 @@ CREATE TABLE `transaction` (
   `sendback_txs_amount` int default null,
   `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   
+   `transaction_signature` varchar(256) default null,
   PRIMARY KEY (`transaction_id`),
   CONSTRAINT `fk_blockindex` FOREIGN KEY (`block_index`) REFERENCES `blocks` (`block_index`) ,
    CONSTRAINT `fk_projectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) 
@@ -107,8 +108,9 @@ CREATE TABLE `pending_transactions` (
   `transaction_type` varchar(20) NOT NULL,
   `project_id` int DEFAULT NULL,
   
+  
   `create_txs_project_beneficiary_create_address` varchar(256) DEFAULT NULL,
-  `create_txs_projectCreateTimestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_txs_project_create_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   
   `confirm_txs_project_organization_confirm_address` varchar(256) DEFAULT NULL,
   `confirm_txs_project_confirm_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -121,21 +123,14 @@ CREATE TABLE `pending_transactions` (
    `sendback_txs_from_address` varchar(256) DEFAULT NULL,
   `sendback_txs_to_address` varchar(256) DEFAULT NULL,
   `sendback_txs_amount` int default null,
-  `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  
+  `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `transaction_signature` varchar(256) default null
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into `project` values (0,'genesis','genesis','genesis','2021-01-01','2021-01-01','2021-01-01');
-insert into `blocks` values(0,'2021-01-01',"genesisHash","genesispreviousHash",0,0);
-insert into `transaction` values(0,'genesis',0,0, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01');
-
-
-insert into `transaction` values(1,'genesis',0,0, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01');
-
-
-insert into `project` values (1,'genesis','genesis','genesis','2021-01-01','2021-01-01','2021-01-01');
+insert into `project` values (1,'genesis','genesis','genesis','genesis_description','2021-01-01','2021-01-01','2021-01-01');
 insert into `blocks` values(1,'2021-01-01',"genesisHash","genesispreviousHash",0,0);
-insert into `transaction` values(2,'genesis',0,1, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01');
+insert into `transaction` values(1,'genesis',1,1, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01','genesisSignature');
+
 
  
 insert into `users` values ('04f8d1e28efd7f3ddc40686cccc0b025597e192bf6aac9ada6bfda95848296a68da6a4e30f98aa340a90b05c30fca885acc1abfbd043116c4ed77f8903eb6ba489','Hoi chu thap do','hctd@gmail.com','organization');
