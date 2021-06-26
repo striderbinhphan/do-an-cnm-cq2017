@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "pm2 start ecosystem.config.json --no-daemon",
+    "docker-build": "docker-compose up --build"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.2.5",
+    "path": "^0.12.7",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2"
   }

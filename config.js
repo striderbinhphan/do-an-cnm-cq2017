@@ -6,7 +6,6 @@ dotenv.config({ path: path.join(__dirname, './.env') });
 
 const envVarsSchema = Joi.object()
   .keys({
-    NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(8000),
     
     ENV_DB_HOST: Joi.string().required(),
@@ -24,7 +23,6 @@ if (error) {
 }
 
 module.exports = {
-  env: envVars.NODE_ENV,
   port: envVars.PORT || 8000,
   mysql: {
     host: envVars.ENV_DB_HOST,

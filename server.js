@@ -335,6 +335,10 @@ app.get("/fetch", async (req, res) => {
   res.json(list).end();
 });
 
+app.get('/', (req, res)=>{
+  res.send('OK')
+})
+
 io.on("connection", (socket) => {
   console.info(`Socket connected, ID: ${socket.id}`);
 
