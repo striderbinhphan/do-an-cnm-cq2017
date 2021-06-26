@@ -17,7 +17,8 @@ const { transactions } = require("./utils/constants");
 //const transactionModel = require('./models/transaction/transaction.model');
 const blockchainModel = require("./models/blockchain.model");
 const { getFormattedDate } = require("./utils/common-function");
-const PORT = process.env.PORT || 8000;
+const config = require('./config')
+const PORT = config.port
 app.use(bodyParser.json());
 app.use(logger("dev"));
 app.use(cors());
