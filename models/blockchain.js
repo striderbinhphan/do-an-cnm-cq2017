@@ -227,6 +227,9 @@ class CharityBlockChain{//blockchain services
     getUnconfirmProjectList(){
         return this.projectList.filter(c=>c.projectOrganizationConfirmAddress===null);
     }
+    getConfirmProjectList(){
+        return this.projectList.filter(c=>c.projectOrganizationConfirmAddress!==null);
+    }
     getDonateProjectList(){
         const currentDate = new Date().getTime();
         return this.projectList.filter(c=>(c.projectOrganizationConfirmAddress!==null&&getTimestamp(c.projectDeadline)>=currentDate));

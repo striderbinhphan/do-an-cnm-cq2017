@@ -179,6 +179,9 @@ app.post("/projects", async (req, res) => {
 app.get("/unconfirm-projects", (req, res) => {
   res.json(charityBlockChain.getUnconfirmProjectList()).end();
 });
+app.get("/confirm-projects", (req, res) => {
+  res.json(charityBlockChain.getConfirmProjectList()).end();
+});
 app.post("/unconfirm-projects", async (req, res) => {
   const { projectId, projectOrganizationConfirmAddress, privateKey } = req.body;
   const confirmData = {
@@ -334,10 +337,6 @@ app.get("/fetch", async (req, res) => {
   const list = await charityBlockChain.fetchData();
   res.json(list).end();
 });
-
-app.get('/', (req, res)=>{
-  res.send('OK')
-})
 
 io.on("connection", (socket) => {
   console.info(`Socket connected, ID: ${socket.id}`);
