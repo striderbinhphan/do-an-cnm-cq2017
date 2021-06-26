@@ -10,7 +10,7 @@ const envVarsSchema = Joi.object()
     PORT: Joi.number().default(8000),
     
     ENV_DB_HOST: Joi.string().required(),
-    ENV_DB_PORT: Joi.number().default(3036),
+    ENV_DB_PORT: Joi.number().required(),
     ENV_DB_NAME: Joi.string().required(),
     ENV_DB_USER: Joi.string().required(),
     ENV_DB_PASSWORD: Joi.string().required(),

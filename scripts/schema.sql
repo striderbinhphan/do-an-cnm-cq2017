@@ -1,10 +1,10 @@
-use blockchain;
+USE blockchain;
 
 --
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `address` varchar(256) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `email` varchar(256) default null,
@@ -20,7 +20,7 @@ CREATE TABLE `users` (
 --
 
 
-CREATE TABLE `project` (
+CREATE TABLE IF NOT EXISTS `project` (
   `project_id` int NOT NULL auto_increment,
   `project_name` varchar(256) not  NULL,
   `project_beneficiary_create_address` varchar(256) DEFAULT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE `project` (
 -- Table structure for table `block`
 --
 
-CREATE TABLE `blocks` (
+CREATE TABLE IF NOT EXISTS `blocks` (
   `block_index` int NOT NULL auto_increment,
   `block_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   `block_hash` varchar(256) DEFAULT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE `blocks` (
 -- Table structure for table `transaction`
 --
 
-CREATE TABLE `transaction` (
+CREATE TABLE IF NOT EXISTS `transaction` (
   `transaction_id` int NOT NULL auto_increment,
   `transaction_type` varchar(20) NOT NULL,
   `project_id` int DEFAULT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE `transaction` (
 -- Table structure for table `nodes`
 --
 
-CREATE TABLE `nodes` (
+CREATE TABLE IF NOT EXISTS `nodes` (
   `node_index` varchar(45) NOT NULL,
   `host` varchar(256) DEFAULT NULL,
   `port` varchar(45) DEFAULT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE `nodes` (
 -- Table structure for table `pendingTransactions`
 --
 
-CREATE TABLE `pending_transactions` (
+CREATE TABLE IF NOT EXISTS `pending_transactions` (
   `transaction_type` varchar(20) NOT NULL,
   `project_id` int DEFAULT NULL,
   
@@ -125,12 +125,3 @@ CREATE TABLE `pending_transactions` (
   `sendback_txs_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ,
   `transaction_signature` varchar(256) default null
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-insert into `project` values (1,'genesis','genesis','genesis','genesis_description','2021-01-01','2021-01-01','2021-01-01');
-insert into `blocks` values(1,'2021-01-01',"genesisHash","genesispreviousHash",0,0);
-insert into `transaction` values(1,'genesis',1,1, null, '2021-01-01',null,'2021-01-01',null,null,null,'2021-01-01',null,null,null,'2021-01-01','genesisSignature');
-
-
- 
-insert into `users` values ('04f8d1e28efd7f3ddc40686cccc0b025597e192bf6aac9ada6bfda95848296a68da6a4e30f98aa340a90b05c30fca885acc1abfbd043116c4ed77f8903eb6ba489','Hoi chu thap do','hctd@gmail.com','organization');
-insert into `users` values ('043357fbded6ac0519e19db7cead0d6579876ff4c274a776d50cfde9cfb60642bbacb1a323cf952f36f85fe24f0f220a067e9e52d3e61f37701e7e1f4a399722bf','Mat tran To quoc Viet Nam','mttqvn@gmail.com','organization');
