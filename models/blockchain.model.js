@@ -9,6 +9,9 @@ module.exports = {
     return db('blocks').insert(newBlock);
   },
   //transaction model
+  getDonateTransactions(){
+    return db('transaction').where('transaction_type',"donate");
+  },
   getTransactionByBlockIndex(index){
     return db('transaction').where('block_index',index);
   

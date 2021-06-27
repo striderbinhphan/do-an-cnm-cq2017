@@ -332,6 +332,13 @@ app.post("/sendback-projects", async (req, res) => {
     res.status(204).end();
   }
 });
+app.get("/donate-transactions", async (req, res) => {
+  const list = await blockchainModel.getDonateTransactions();
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list);
+});
 
 app.get("/fetch", async (req, res) => {
   const list = await charityBlockChain.fetchData();
