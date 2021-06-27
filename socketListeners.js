@@ -86,11 +86,11 @@ const socketListeners = (io, socket, chain) => {
     chain.createUser(newUser);
   });
   socket.on(transactions.ADD_PROJECT,(newProject)=>{
-    console.log(newProject);
+    console.log("added new project to our ledger",newProject);
     chain.addProject(newProject);
   });
   socket.on(transactions.CONFIRM_PROJECT,(confirmData)=>{
-    console.log(confirmData);
+    console.log("confirmt project to our ledger",confirmData);
     chain.updateProject(confirmData);
   })
   return socket;

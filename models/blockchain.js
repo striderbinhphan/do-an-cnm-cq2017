@@ -350,7 +350,7 @@ class CharityBlockChain{//blockchain services
         }
     }
     async addProject(projectDbObj){
-        await blockchainModel.addProject(projectDbObj);
+        return await blockchainModel.addProject(projectDbObj);
     }
     //===========confirm project involved methods 
     async confirmProject(projectInfo,confirmEcKey){
@@ -394,7 +394,7 @@ class CharityBlockChain{//blockchain services
         }
     }
     async updateProject(confirmData){
-        await blockchainModel.updateConfirmAddress(confirmData.projectId,confirmData.confirmAddress,confirmData.confirmTimestamp);
+        return await blockchainModel.updateConfirmAddress(confirmData.projectId,confirmData.confirmAddress,confirmData.confirmTimestamp);
     }
     //============sending money from donate => organization or organization to beneficiary
     verifyDonateTimestamp(projectId, donateTimestamp){
