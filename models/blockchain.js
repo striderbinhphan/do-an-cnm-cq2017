@@ -269,6 +269,7 @@ class CharityBlockChain{//blockchain services
     }
     //=============create new User  involved methods
     async createUser(newUser){
+        io.emit(transactions.ADD_USER, newUser);
         this.addressList.push(newUser);
         return await blockchainModel.addNewUser(newUser);
         //console.log("added new User:" ,newUser);

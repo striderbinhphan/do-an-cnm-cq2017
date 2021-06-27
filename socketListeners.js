@@ -73,15 +73,18 @@ const socketListeners = (io, socket, chain) => {
   //   chain.setElection(year, name, nominees, deadline);
   // });
 
-  socket.on(transactions.EXTEND_PROJECT_DEADLINE, (data) => {
-    const { year, name, newDeadline } = data;
-    chain.extentElection(year, name, newDeadline);
-  });
+  // socket.on(transactions.EXTEND_PROJECT_DEADLINE, (data) => {
+  //   const { year, name, newDeadline } = data;
+  //   chain.extentElection(year, name, newDeadline);
+  // });
 
   socket.on(transactions.CHECKING, () => {
     console.log("Im OK");
   });
-
+  socket.on(transactions.ADD_USER, (newUser) => {
+    console.log("added new User to our ledger", newUser);
+    chain.createUser(newUser);
+  });
   return socket;
 };
 

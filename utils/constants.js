@@ -8,6 +8,7 @@ module.exports.transactions = {
     HELLO: "hello",
     EXTEND_PROJECT_DEADLINE: "extend_project_deadline",
     CHECKING: "checking",
+    ADD_USER: "add_user",
   };
   
   module.exports.constants = {
