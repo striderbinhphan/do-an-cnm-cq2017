@@ -71,6 +71,12 @@ module.exports = {
   getProjectByID(projectID){
     return db('project').where('project_id',projectID);
  },
+ getAllProjectConfirmedByOrganizationAddress(organizationAddress){
+  return db('project').where('project_organization_confirm_address',organizationAddress);
+},
+getAllProjectCreatedByBeneficiaryAddress(beneficiaryAddress){
+  return db('project').where('project_beneficiary_create_address',beneficiaryAddress);
+},
 
   //node model
 

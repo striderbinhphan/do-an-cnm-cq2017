@@ -268,6 +268,24 @@ app.get("/project/:id", async (req, res) => {
   }
   res.json(list[0]);
 });
+app.get("/confirmedProject/:organizationAddress", async (req, res) => {
+  const organizationAddress = req.params.organizationAddress;
+  const list = await blockchainModel.getAllProjectConfirmedByOrganizationAddress(organizationAddress);
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list);
+});
+app.get("/createdProject/:beneficiaryAddress", async (req, res) => {
+  const beneficiaryAddress = req.params.beneficiaryAddress;
+  const list = await blockchainModel.getAllProjectCreatedByBeneficiaryAddress(beneficiaryAddress);
+  if (list.length === 0) {
+    return res.status(204).end();
+  }
+  res.json(list);
+});
+
+
 app.get("/transaction/:id", async (req, res) => {
   const id = +req.params.id;
   const list = await getTransactionByID(id);
