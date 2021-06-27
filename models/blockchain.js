@@ -595,20 +595,20 @@ class CharityBlockChain{//blockchain services
         tempChain.push(block);
         console.log(tempChain);
          //save database //cai dat peer2peer can xoa di
-         const blockObj = {
-            block_index: block.index,
-            block_timestamp: block.timestamp,
-            block_hash: block.hash,
-            block_previoushash: block.previousHash,
-            block_nonce: block.nonce,
-            block_difficulty: block.difficulty
-        }
-        //=================luu database project
-        const addBlockResult = await blockchainModel.addNewBlock(blockObj);
-        console.log("created Project:",addBlockResult);
-        block.transactions.map(async(txs)=>{
-             await this.addTransactionInBlockToDB(txs,block.index);
-        });
+        //  const blockObj = {
+        //     block_index: block.index,
+        //     block_timestamp: block.timestamp,
+        //     block_hash: block.hash,
+        //     block_previoushash: block.previousHash,
+        //     block_nonce: block.nonce,
+        //     block_difficulty: block.difficulty
+        // }
+        // //=================luu database project
+        // const addBlockResult = await blockchainModel.addNewBlock(blockObj);
+        // console.log("created Project:",addBlockResult);
+        // block.transactions.map(async(txs)=>{
+        //      await this.addTransactionInBlockToDB(txs,block.index);
+        // });
         //=========================>xoa
         this.io.emit(transactions.END_MINING, {
             blocks: tempChain,
