@@ -278,7 +278,10 @@ class CharityBlockChain{//blockchain services
         else{
             throw new Error("this user is created before");
         }
-    }   
+    }
+    // addUser(newUser){
+    //     return await blockchainModel.addNewUser(newUser);
+    // }     
     isUserExisting(publicKey){
         return this.addressList.map((ad)=>ad.address).includes(publicKey);
     }
