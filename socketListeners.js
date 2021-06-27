@@ -85,6 +85,14 @@ const socketListeners = (io, socket, chain) => {
     console.log("added new User to our ledger", newUser);
     chain.createUser(newUser);
   });
+  socket.on(transactions.ADD_PROJECT,(newProject)=>{
+    console.log(newProject);
+    chain.addProject(newProject);
+  });
+  socket.on(transactions.CONFIRM_PROJECT,(confirmData)=>{
+    console.log(confirmData);
+    chain.updateProject(confirmData);
+  })
   return socket;
 };
 

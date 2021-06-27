@@ -26,7 +26,7 @@ class CharityBlockChain{//blockchain services
         this.fetchBlocksData();
         this.fetchUsersData();
         this.fetchProjectsData();
-        this.fetchNodesData();
+        //this.fetchNodesData();
         this.fetchPendingTransactionData();
         
 
@@ -269,10 +269,15 @@ class CharityBlockChain{//blockchain services
     }
     //=============create new User  involved methods
     async createUser(newUser){
-        this.io.emit(transactions.ADD_USER, newUser);
-        this.addressList.push(newUser);
-        return await blockchainModel.addNewUser(newUser);
-        //console.log("added new User:" ,newUser);
+        if(!this.isUserExisting(newUser.address)){
+            this.io.emit(transactions.ADD_USER, newUser);
+            this.addressList.push(newUser);
+            return await blockchainModel.addNewUser(newUser);
+            //console.log("added new User:" ,newUser);
+        }
+        else{
+            throw new Error("this user is created before");
+        }
     }   
     isUserExisting(publicKey){
         return this.addressList.map((ad)=>ad.address).includes(publicKey);
@@ -327,6 +332,7 @@ class CharityBlockChain{//blockchain services
                     //=================luu database project
                     const addProjectResult = await blockchainModel.addProject(projectDbObj);
                     console.log("created Project:",addProjectResult);
+                    this.io.emit(transactions.ADD_PROJECT, projectDbObj);
                     //console.log("project list",this.projectList);
                     return true;
                 } else{
@@ -342,6 +348,9 @@ class CharityBlockChain{//blockchain services
             console.log("This charity project has name which existing in our blockchain");
             return false;
         }
+    }
+    async addProject(projectDbObj){
+        await blockchainModel.addProject(projectDbObj);
     }
     //===========confirm project involved methods 
     async confirmProject(projectInfo,confirmEcKey){
@@ -361,6 +370,12 @@ class CharityBlockChain{//blockchain services
                     this.projectList[projectIndex].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
                     //update data to database
                     await blockchainModel.updateConfirmAddress(projectInfo.projectId,confirmEcKey.getPublic('hex'),projectInfo.projectConfirmTimestamp);
+                    const confirmData = {
+                        projectId: projectInfo.projectId,
+                        confirmAddress:confirmEcKey.getPublic('hex'),
+                        confirmTimestamp: projectInfo.projectConfirmTimestamp
+                    }
+                    this.io.emit(transactions.CONFIRM_PROJECT, confirmData);
                     //delete projectTemp;
                     return true;
                 }else{
@@ -377,6 +392,9 @@ class CharityBlockChain{//blockchain services
             console.log("This charity project has id which existing in our blockchain & this charity project has been confirmed");
             return false;
         }
+    }
+    async updateProject(confirmData){
+        await blockchainModel.updateConfirmAddress(confirmData.projectId,confirmData.confirmAddress,confirmData.confirmTimestamp);
     }
     //============sending money from donate => organization or organization to beneficiary
     verifyDonateTimestamp(projectId, donateTimestamp){
