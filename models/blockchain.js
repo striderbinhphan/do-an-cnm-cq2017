@@ -263,7 +263,7 @@ class CharityBlockChain{//blockchain services
         return this.pendingTransactions;
     }
     //====blockchain methods control
-    addNode(node) {
+    addNode(newNode) {
         this.nodes.push(newNode);
         blockchainModel.addNode(newNode);
     }
