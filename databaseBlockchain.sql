@@ -1,11 +1,11 @@
-use blockchain;
+use `heroku_ba5f48ad89f2c37`;
 
 --
 -- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
-  `address` varchar(256) NOT NULL,
+  `address` varchar(150) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   `email` varchar(256) default null,
   `role` varchar(45) DEFAULT NULL, 
