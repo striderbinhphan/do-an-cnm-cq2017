@@ -7,7 +7,12 @@ const ec = new EC('secp256k1');
 const fork = require('../utils/global');
 const {transactions, constants}  = require('../utils/constants');
 const {calculateHash, hashMatchesDifficulty, calculateHashFromBlock , getFormattedDate, getTimestamp} = require('../utils/common-function');
-const blockchainModel = require('./blockchain.model');
+const blockchainModel = require('../models/blockchain.model');
+const userModel = require('../models/user.model');
+const pendingModel = require('../models/pending.model');
+const projectModel = require('../models/project.model');
+const transactionModel = require('../models/transaction.model');
+
 class CharityBlockChain{//blockchain services
     constructor(io, blocks){
         
@@ -61,7 +66,7 @@ class CharityBlockChain{//blockchain services
         let objData = null;
         if(transaction.transaction_type === "create"){
             objData ={
-                projectId: transaction.project_id,
+                projectName: transaction.project_name,
                 projectBeneficiaryCreateAddress : transaction.create_txs_project_beneficiary_create_address,
                 projectCreateTimestamp : getFormattedDate(transaction.create_txs_project_create_timestamp),
                 signature : transaction.transaction_signature,
@@ -73,7 +78,7 @@ class CharityBlockChain{//blockchain services
         if(transaction.transaction_type==="confirm"){
         
             objData ={
-                projectId: transaction.project_id,
+                projectName: transaction.project_name,
                 projectOrganizationConfirmAddress: transaction.confirm_txs_project_organization_confirm_address,
                 projectConfirmTimestamp: getFormattedDate(transaction.confirm_txs_project_confirm_timestamp),
                 signature: transaction.transaction_signature
@@ -84,7 +89,7 @@ class CharityBlockChain{//blockchain services
         }
         if(transaction.transaction_type==="donate"){
             objData ={
-                projectId: transaction.projectId,
+                projectName: transaction.projectName,
                 fromAddress: transaction.donate_txs_from_address,
                 toAddress: transaction.donate_txs_to_address,
                 amount: transaction.donate_txs_amount,
@@ -99,7 +104,7 @@ class CharityBlockChain{//blockchain services
 
         if(transaction.transaction_type==="sendback"){
             objData ={
-                projectId: transaction.project_id,
+                projectName: transaction.project_name,
                 fromAddress: transaction.sendback_txs_from_address,
                 toAddress: transaction.sendback_txs_to_address,
                 amount: transaction.sendback_txs_amount,
@@ -115,7 +120,7 @@ class CharityBlockChain{//blockchain services
             objData ={
                 type: "genesis",
                 data:{ 
-                    projectId: transaction.project_id,
+                    projectName: transaction.project_name,
                     signature: transaction.transaction_signature
                 }
             }
@@ -139,7 +144,7 @@ class CharityBlockChain{//blockchain services
         const projectList = await blockchainModel.getProjectList();
         //console.log(projectList);
         projectList.map(p=>this.projectList.push({
-            projectId:p.project_id,
+            projectName:p.project_name,
             projectName: p.project_name,
             projectBeneficiaryCreateAddress: p.project_beneficiary_create_address,
             projectOrganizationConfirmAddress: p.project_organization_confirm_address,
@@ -166,7 +171,7 @@ class CharityBlockChain{//blockchain services
         let objData = null;
         if(transaction.transaction_type === "create"){
             objData ={
-                projectId: transaction.project_id,
+                projectName: transaction.project_name,
                 projectBeneficiaryCreateAddress : transaction.create_txs_project_beneficiary_create_address,
                 projectCreateTimestamp : getFormattedDate(transaction.create_txs_project_create_timestamp),
                 signature : transaction.transaction_signature,
@@ -178,7 +183,7 @@ class CharityBlockChain{//blockchain services
         if(transaction.transaction_type==="confirm"){
         
             objData ={
-                projectId: transaction.project_id,
+                projectName: transaction.project_name,
                 projectOrganizationConfirmAddress: transaction.confirm_txs_project_organization_confirm_address,
                 projectConfirmTimestamp: getFormattedDate(transaction.confirm_txs_project_confirm_timestamp),
                 signature: transaction.transaction_signature
@@ -188,7 +193,7 @@ class CharityBlockChain{//blockchain services
         }
         if(transaction.transaction_type==="donate"){
             objData ={
-                projectId: transaction.projectId,
+                projectName: transaction.projectName,
                 fromAddress: transaction.donate_txs_from_address,
                 toAddress: transaction.donate_txs_to_address,
                 amount: transaction.donate_txs_amount,
@@ -201,7 +206,7 @@ class CharityBlockChain{//blockchain services
 
         if(transaction.transaction_type==="sendback"){
             objData ={
-                projectId: transaction.project_id,
+                projectName: transaction.project_name,
                 fromAddress: transaction.sendback_txs_from_address,
                 toAddress: transaction.sendback_txs_to_address,
                 amount: transaction.sendback_txs_amount,
@@ -212,41 +217,16 @@ class CharityBlockChain{//blockchain services
             this.pendingTransactions.push(sendbackTxs);
         }
     }
-    getLatestBlock(){
-        return this.blocks[this.blocks.length -1];
-    }
-    getLength(){
-        return this.blocks.length();
-    }
-    getBlocks(){
-        return this.blocks;
-    }
-    getProjectList(){
-        return this.projectList;
-    }
+    
+    
+    
     getUnconfirmProjectList(){
         return this.projectList.filter(c=>c.projectOrganizationConfirmAddress===null);
     }
-    getConfirmProjectList(){
-        return this.projectList.filter(c=>c.projectOrganizationConfirmAddress!==null);
-    }
-    getDonateProjectList(){
-        const currentDate = new Date().getTime();
-        return this.projectList.filter(c=>(c.projectOrganizationConfirmAddress!==null&&getTimestamp(c.projectDeadline)>=currentDate));
-    }
-    getSendbackProjectList(){
-        const currentDate = new Date().getTime();
-        return this.projectList.filter(c=>(c.projectOrganizationConfirmAddress!==null&&getTimestamp(c.projectDeadline)<=currentDate));
-    }
-    getOrganizationConfirmAddressFromProjectId(projectId){
-        const index = projectId -1;
-        console.log()
-        return this.projectList[index].projectOrganizationConfirmAddress;
-    }
-    getBeneficiaryAddressFromProjectId(projectId){
-        const index = projectId -1;
-        return this.projectList[index].projectBeneficiaryCreateAddress;
-    }
+    
+    
+    
+    
 
     getNodeList(){
         return this.nodes;
@@ -256,17 +236,9 @@ class CharityBlockChain{//blockchain services
         return this.nodes;
     }
 
-    getUserList(){
-        return this.addressList;
-    }
-    getPendingTransactions(){
-        return this.pendingTransactions;
-    }
-    //====blockchain methods control
-    addNode(newNode) {
-        this.nodes.push(newNode);
-        blockchainModel.addNode(newNode);
-    }
+    
+   
+    
     //=============create new User  involved methods
     async createUser(newUser){
         if(!this.isUserExisting(newUser.address)){
@@ -282,48 +254,125 @@ class CharityBlockChain{//blockchain services
     // addUser(newUser){
     //     return await blockchainModel.addNewUser(newUser);
     // }     
-    isUserExisting(publicKey){
-        return this.addressList.map((ad)=>ad.address).includes(publicKey);
-    }
-    getUserInfo(publicKey){
-        return this.addressList[this.addressList.map((ad)=>ad.address).indexOf(publicKey)];
-    }
+    
+    
     //============create project involved methods =============
     getSumOfProject(){
         return this.projectList.length;
     }
    
-    isExistingProjectByName(projectName){
-        return this.projectList.map(p=>p.projectName).includes(projectName);
-    }
-    isExistingProjectById(projectId){
-        return this.projectList.map(p=>p.projectId).includes(projectId);
-    }
+    
+    
     isExistingUser(projectBeneficiaryCreateAddress){
         return this.addressList.map(u=>u.address).includes(projectBeneficiaryCreateAddress);
     }
+    
+    
+    
+    
+   
+    
+    
+
+
+
+
+
+
+
+
+
+    //fixxxxxxxxxxxxxxxxx
+    //====blockchain methods control
+    addNode(newNode) {
+        this.nodes.push(newNode);
+        blockchainModel.addNode(newNode);
+    }
+
+
+
+    getLatestBlock(){
+        return this.blocks[this.blocks.length -1];
+    }
+    getLength(){
+        return this.blocks.length();
+    }
+
+
+    //===========get methods
+    getUserInfo(address){
+        return userModel.getSingleUser(address);
+    };
+    getUserList(){
+        return userModel.all();
+    };
+    getPendingTransactions(){
+        return pendingModel.all();
+    };
+    getBlocks(){
+        return this.blocks;
+    };
+    getProjectList(){
+        return projectModel.all();
+    };
+    getConfirmProjectList(){
+        return projectModel.getConfirmProjectList();
+    }
+    async getDonateProjectList(){
+        const currentDate = new Date().getTime();
+        const projectList =await projectModel.all();
+        //console.log(projectList);
+        return projectList.filter(c=>(c.project_organization_confirm_address!==null&&getTimestamp(c.project_deadline)>=currentDate));
+    }
+    async getSendbackProjectList(){
+        const currentDate = new Date().getTime();
+        const projectList =await projectModel.all();
+        return projectList.filter(c=>(c.projectOrganizationConfirmAddress!==null&&getTimestamp(c.project_deadline)<=currentDate));
+    }
+    
+    //=================================check methods
+    
+    isUserExisting(address){
+        return userModel.isExistUser(address);
+    };
+    
+    isProjectExistingByProjectName(projectName){
+        //console.log("test",projectModel.isExistProject(projectName));
+        return projectModel.isExistProject(projectName);
+    }
+    //=====interaction methods
+    async register(newUser){
+        //console.log()
+        if(!await this.isUserExisting(newUser.address)){
+            this.io.emit(transactions.ADD_USER, newUser);
+            return userModel.addNewUser(newUser);
+            //console.log("added new User:" ,newUser);
+        }
+        else{
+            throw new Error("this user is created before");
+        }
+        
+    };
     async createProject(newProjectInfo,ecKey){
-        if(!this.isExistingUser(newProjectInfo.projectBeneficiaryCreateAddress)){
+        if(!this.isUserExisting(newProjectInfo.projectBeneficiaryCreateAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
-        if(!this.isExistingProjectByName(newProjectInfo.projectName)){
-            //vi project moi nen chua co id trong he thong
-            newProjectInfo.projectId = this.projectList.length+1;
+        if(!await this.isProjectExistingByProjectName(newProjectInfo.projectName)){
             //tao transactino create
             const createdTxs = new Transaction("create",newProjectInfo);//CreateProjectTransaction
             //kiem tra neu ky vao giao dich that bai
             if(createdTxs.signTransaction(ecKey)){
                 if(await this.addTransaction(createdTxs)){
+                    //broadcast create transaction
                     this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
+
+
                     const projectTemp = new charityProject(null,null,null,null,null,null,null);
                     projectTemp.setInfo(newProjectInfo);
-                    this.projectList.push(projectTemp);
-                    console.log(projectTemp);
 
                     //bien luu gia tri luu vao db
-                    const projectDbObj = {
-                        project_id: null,
+                    const newProject = {
                         project_name: projectTemp.projectName,
                         project_beneficiary_create_address: projectTemp.projectBeneficiaryCreateAddress,
                         project_organization_confirm_address: projectTemp.projectOrganizationConfirmAddress,
@@ -333,9 +382,12 @@ class CharityBlockChain{//blockchain services
                         project_deadline: projectTemp.projectDeadline
                     }
                     //=================luu database project
-                    const addProjectResult = await blockchainModel.addProject(projectDbObj);
+                    const addProjectResult = await projectModel.addNewProject(newProject);
                     console.log("created Project:",addProjectResult);
+
+                    //broadcast new project
                     this.io.emit(transactions.ADD_PROJECT, newProjectInfo);
+
                     //console.log("project list",this.projectList);
                     return true;
                 } else{
@@ -352,15 +404,75 @@ class CharityBlockChain{//blockchain services
             return false;
         }
     }
-    async addProject(newProjectInfo){
+    //==========add transactino involved methods ===========
+    async addTransaction(transaction){
+        if(transaction.isValidTransaction()){
+            
+            const result = await this.addTransactionToPendingTransactionDatabase(transaction);
+            console.log("added transaction: ", result)
+            await this.miningBlock();
+            return true;
+        }else{
+            console.log("This transaction is invalid");
+            return false;
+        }
+    }
+    addTransactionToPendingTransactionDatabase(transaction){
+        let newPendingTxs = null;
+        if(transaction.type === "create"){
+            newPendingTxs ={
+                transaction_type: transaction.type,
+                project_name: transaction.data.projectName,
+                create_txs_project_beneficiary_create_address: transaction.data.projectBeneficiaryCreateAddress,
+                create_txs_project_create_timestamp: transaction.data.projectCreateTimestamp,
+                transaction_signature: transaction.data.signature
+            }
+            
+        }
+        if(transaction.type==="confirm"){
+        
+            newPendingTxs ={
+                transaction_type: transaction.type,
+                project_name: transaction.data.projectName,
+                confirm_txs_project_organization_confirm_address: transaction.data.projectOrganizationConfirmAddress,
+                confirm_txs_project_confirm_timestamp: transaction.data.projectConfirmTimestamp,
+                transaction_signature: transaction.data.signature
+            }
+            
+        }
+        if(transaction.type==="donate"){
+            newPendingTxs ={
+                transaction_type: transaction.type,
+                project_name: transaction.data.projectName,
+                donate_txs_from_address: transaction.data.fromAddress,
+                donate_txs_to_address: transaction.data.toAddress,
+                donate_txs_amount: transaction.data.amount,
+                donate_txs_timestamp: transaction.data.donateTimestamp,
+                transaction_signature: transaction.data.signature
+            }
+        
+        }
+
+        if(transaction.type==="sendback"){
+            newPendingTxs ={
+                transaction_type: transaction.type,
+                project_name: transaction.data.projectName,
+                sendback_txs_from_address: transaction.data.fromAddress,
+                sendback_txs_to_address: transaction.data.toAddress,
+                sendback_txs_amount: transaction.data.amount,
+                sendback_txs_timestamp: transaction.data.sendbackTimestamp,
+                transaction_signature: transaction.data.signature
+            }
+        
+        }
+        return pendingModel.addNewPending(newPendingTxs);
+    }
+    addProject(newProjectInfo){
         const projectTemp = new charityProject(null,null,null,null,null,null,null);
         projectTemp.setInfo(newProjectInfo);
-        this.projectList.push(projectTemp);
-        console.log(projectTemp);
 
         //bien luu gia tri luu vao db
-        const projectDbObj = {
-            project_id: null,
+        const pendingTxs = {
             project_name: projectTemp.projectName,
             project_beneficiary_create_address: projectTemp.projectBeneficiaryCreateAddress,
             project_organization_confirm_address: projectTemp.projectOrganizationConfirmAddress,
@@ -369,28 +481,31 @@ class CharityBlockChain{//blockchain services
             project_confirm_timestamp: projectTemp.projectConfirmTimestamp,
             project_deadline: projectTemp.projectDeadline
         }
-        return await blockchainModel.addProject(projectDbObj);
+        return pendingModel.addNewPending(pendingTxs);
     }
+
     //===========confirm project involved methods 
+
+    isUnconfirmed(projectName){
+        return projectModel.isUnconfirmed(projectName);
+    }
     async confirmProject(projectInfo,confirmEcKey){
-        const projectIndex = projectInfo.projectId -1;
-        if(!this.isExistingUser(projectInfo.projectOrganizationConfirmAddress)){
+        if(!this.isUserExisting(projectInfo.projectOrganizationConfirmAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
-        if(this.isExistingProjectById(projectInfo.projectId)&& this.projectList[projectIndex].projectOrganizationConfirmAddress===null){
-           
+        //console.log("check",await this.isExistingProjectById(projectInfo.projectName),await this.isConfirmed(projectInfo.projectName));
+        if(await this.isProjectExistingByProjectName(projectInfo.projectName)&& await this.isUnconfirmed(projectInfo.projectName)){
+           console.log("vao oke");
             const confirmTxs = new Transaction("confirm",projectInfo);
             if(confirmTxs.signTransaction(confirmEcKey)){
                 if(await this.addTransaction(confirmTxs)){ 
                     this.io.emit(transactions.ADD_TRANSACTION,confirmTxs);
     
-                    this.projectList[projectIndex].projectOrganizationConfirmAddress = confirmEcKey.getPublic('hex');
-                    this.projectList[projectIndex].projectConfirmTimestamp = projectInfo.projectConfirmTimestamp;
                     //update data to database
-                    await blockchainModel.updateConfirmAddress(projectInfo.projectId,confirmEcKey.getPublic('hex'),projectInfo.projectConfirmTimestamp);
+                    await projectModel.updateConfirmAddress(projectInfo.projectName,confirmEcKey.getPublic('hex'),projectInfo.projectConfirmTimestamp);
                     const confirmData = {
-                        projectId : projectInfo.projectId,
+                        projectName : projectInfo.projectName,
                         address: confirmEcKey.getPublic('hex'),
                         timestamp: projectInfo.projectConfirmTimestamp
                     }
@@ -412,30 +527,28 @@ class CharityBlockChain{//blockchain services
             return false;
         }
     }
-    async updateProject(confirmData){
-        const projectIndex = confirmData.projectId -1;
-        this.projectList[projectIndex].projectOrganizationConfirmAddress = confirmData.address;
-        this.projectList[projectIndex].projectConfirmTimestamp = confirmData.timestamp;
-        return await blockchainModel.updateConfirmAddress(confirmData.projectId,confirmData.address,confirmData.timestamp);
+    updateProject(confirmData){
+        return  projectModel.updateConfirmAddress(confirmData.projectName,confirmData.address,confirmData.timestamp);
     }
-    //============sending money from donate => organization or organization to beneficiary
-    verifyDonateTimestamp(projectId, donateTimestamp){
-        const index = projectId -1;
-        if(getTimestamp(this.projectList[index].projectConfirmTimestamp)<=getTimestamp(donateTimestamp) && getTimestamp(donateTimestamp)<=getTimestamp(this.projectList[index].projectDeadline)){
-            return true;
-        }
-        else{
-            console.log("This charity project is expired to donate. Comback when deadline is extended");
-            return false;
-        }
+
+    //===donate
+    getOrganizationConfirmAddressFromprojectName(projectName){
+        return projectModel.getOrganizationConfirmAddress(projectName);
     }
+    async verifyDonateTimestamp(projectName, donateTimestamp){
+        const deadline = await projectModel.getDeadline(projectName);
+        return new Date(donateTimestamp) <= new Date(deadline) ;
+    }
+
     async donateProject(donateInfo,donaterEcKey){
-        if(!this.isExistingUser(donateInfo.fromAddress)||!this.isExistingUser(donateInfo.toAddress)){
+        if(!this.isUserExisting(donateInfo.fromAddress)||!this.isUserExisting(donateInfo.toAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
-        if(this.isExistingProjectById(donateInfo.projectId)){
-           if(this.verifyDonateTimestamp(donateInfo.projectId,donateInfo.donateTimestamp)){
+        if(await this.isProjectExistingByProjectName(donateInfo.projectName)){
+            
+           if(this.verifyDonateTimestamp(donateInfo.projectName,donateInfo.donateTimestamp))//============sending money from donate => organization or organization to beneficiary
+           {
                 const donateTxs = new Transaction("donate",donateInfo);
                 if(donateTxs.signTransaction(donaterEcKey)){
                     if(await this.addTransaction(donateTxs)){
@@ -463,14 +576,19 @@ class CharityBlockChain{//blockchain services
             return false;
         }
     }
-     //============sending money from donate => organization or organization to beneficiary
+    //===senback methods
+    getBeneficiaryAddressFromprojectName(projectName){
+        return projectModel.getBeneficiaryAddress(projectName);
+    }
+
+    
+    //============sending money from donate => organization or organization to beneficiary
     async sendbackProject(sendbackInfo,orgaEcKey){
-        const index = sendbackInfo.projectId -1;
-        if(!this.isExistingUser(sendbackInfo.fromAddress)||!this.isExistingUser(sendbackInfo.toAddress)){
+        if(!this.isUserExisting(sendbackInfo.fromAddress)||!this.isUserExisting(sendbackInfo.toAddress)){
             console.log("User address isn't existing in our system, pls register!");
             return false;
         }
-        if(this.isExistingProjectById(sendbackInfo.projectId)){
+        if(this.isProjectExistingByProjectName(sendbackInfo.projectName)){
             if(this.projectList[index].projectOrganizationConfirmAddress!==sendbackInfo.fromAddress ||
                 this.projectList[index].projectBeneficiaryCreateAddress!==sendbackInfo.toAddress){
                 console.log(`From address must be ${this.projectList[index].projectOrganizationConfirmAddress}`);
@@ -498,95 +616,111 @@ class CharityBlockChain{//blockchain services
             return false;
         }
     }
-    //==========add transactino involved methods ===========
-    async addTransaction(transaction){
-        if(transaction.isValidTransaction()){
-            this.pendingTransactions.push(transaction);
-            console.log(transaction);
-            
-            const result = await this.addTransactionToPendingTransactionDatabase(transaction);
-            console.log("added transaction: ", result)
-            await this.miningBlock();
-            return true;
-        }else{
-            console.log("This transaction is invalid");
-            return false;
-        }
+    
+
+
+    getPendingTransactionLength(){
+        return pendingModel.getLength();
     }
-    async addTransactionToPendingTransactionDatabase(transaction){
-        console.log("test function", transaction);
-        let transactionDBObj = null;
-        if(transaction.type === "create"){
-             transactionDBObj ={
-                transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
-                create_txs_project_beneficiary_create_address: transaction.data.projectBeneficiaryCreateAddress,
-                create_txs_project_create_timestamp: transaction.data.projectCreateTimestamp,
-                transaction_signature: transaction.data.signature
+    convertDBDataToVariableData(txData){
+        let objData = null;
+        if(txData.transaction_type === "create"){
+            objData ={
+                projectName: txData.project_name,
+                projectBeneficiaryCreateAddress : txData.create_txs_project_beneficiary_create_address,
+                projectCreateTimestamp : getFormattedDate(txData.create_txs_project_create_timestamp),
+                signature : txData.transaction_signature,
             }
-            
+            const createdTxs = new Transaction("create",objData);
+            console.log(createdTxs);
+            return createdTxs;
         }
-        if(transaction.type==="confirm"){
+        if(txData.transaction_type==="confirm"){
         
-             transactionDBObj ={
-                transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
-                confirm_txs_project_organization_confirm_address: transaction.data.projectOrganizationConfirmAddress,
-                confirm_txs_project_confirm_timestamp: transaction.data.projectConfirmTimestamp,
-                transaction_signature: transaction.data.signature
+            objData ={
+                projectName: txData.project_name,
+                projectOrganizationConfirmAddress: txData.confirm_txs_project_organization_confirm_address,
+                projectConfirmTimestamp: getFormattedDate(txData.confirm_txs_project_confirm_timestamp),
+                signature: txData.transaction_signature
             }
-            
+            const confirmedTxs = new Transaction("confirm",objData);
+            console.log(confirmedTxs);
+            return confirmedTxs;
         }
-        if(transaction.type==="donate"){
-            transactionDBObj ={
-                transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
-                donate_txs_from_address: transaction.data.fromAddress,
-                donate_txs_to_address: transaction.data.toAddress,
-                donate_txs_amount: transaction.data.amount,
-                donate_txs_timestamp: transaction.data.donateTimestamp,
-                transaction_signature: transaction.data.signature
+        if(txData.transaction_type==="donate"){
+            objData ={
+                projectName: txData.project_name,
+                fromAddress: txData.donate_txs_from_address,
+                toAddress: txData.donate_txs_to_address,
+                amount: txData.donate_txs_amount,
+                donateTimestamp: getFormattedDate(txData.donate_txs_timestamp),
+                signature: txData.transaction_signature
             }
-        
+            const donatedTxs = new Transaction("donate",objData);
+            console.log(donatedTxs);
+            
+            return donatedTxs;
         }
 
-        if(transaction.type==="sendback"){
-            transactionDBObj ={
-                transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
-                sendback_txs_from_address: transaction.data.fromAddress,
-                sendback_txs_to_address: transaction.data.toAddress,
-                sendback_txs_amount: transaction.data.amount,
-                sendback_txs_timestamp: transaction.data.sendbackTimestamp,
-                transaction_signature: transaction.data.signature
+        if(txData.transaction_type==="sendback"){
+            objData ={
+                projectName: txData.project_name,
+                fromAddress: txData.sendback_txs_from_address,
+                toAddress: txData.sendback_txs_to_address,
+                amount: txData.sendback_txs_amount,
+                sendbackTimestamp: getFormattedDate(txData.sendback_txs_timestamp),
+                signature: txData.transaction_signature
             }
-        
+            const sendbackTxs = new Transaction("sendback",objData);
+            console.log(sendbackTxs);
+
+            return sendbackTxs;
         }
-        return await blockchainModel.addTransactionToPDTable(transactionDBObj);
+        if(txData.transaction_type==="genesis"){
+            objData ={
+                type: "genesis",
+                data:{ 
+                    projectName: txData.project_name,
+                    signature: txData.transaction_signature
+                }
+            }
+            
+            return objData;
+        }
     }
     async miningBlock(){
-        if (this.pendingTransactions.length >= constants.TRANSACTIONS_IN_BLOCK && !this.miningStatus) {//1
+        
+        const pendingTransactionsLength = await this.getPendingTransactionLength();
+        console.log("length",pendingTransactionsLength);
+        //console.log("pending txs",await this.getPendingTransactions());
+        if (pendingTransactionsLength >= constants.TRANSACTIONS_IN_BLOCK && !this.miningStatus) {//1
             this.miningStatus = true;
             let spliceNumber =
-              this.pendingTransactions.length >= constants.TRANSACTIONS_IN_BLOCK//4
+            pendingTransactionsLength >= constants.TRANSACTIONS_IN_BLOCK//4
                 ? constants.TRANSACTIONS_IN_BLOCK
-                : this.pendingTransactions.length;
-                console.log(spliceNumber);
-            this.transactionBuffer = this.pendingTransactions.splice(0, spliceNumber);//1 //pendingtxs :5 => 1
+                : pendingTransactionsLength;
+            
+            console.log(spliceNumber);
+
+           
+            const pendingTransactions =await this.getPendingTransactions();
+
+            this.transactionBuffer = pendingTransactions.splice(0, spliceNumber);//1 //pendingtxs :5 => 1
             const delTransaction = this.transactionBuffer;
+            console.log(delTransaction);
             //detele database
             delTransaction.map(async (txs)=>{
-                await blockchainModel.deletePendingTransactionBySignature(txs.data.signature)
+                //console.log("dele pending db data", txs);
+                await pendingModel.deleteMinePendingTransaction(txs.transaction_signature)
             });
             
             console.info("Starting mining block...");
             const previousBlock = this.getLatestBlock();
             //console.log(previousBlock);
             const transactionsInBlock = this.transactionBuffer.map((txData) => {
-              let transaction = new Transaction(null,null);
-              transaction.parseData(txData);
-              return transaction;
+                return this.convertDBDataToVariableData(txData);;
             });
+            //console.log("transaction in blockkkkkkkkk",transactionsInBlock);
             const currentTimestamp = getFormattedDate();
 
             const blockObj = {
@@ -612,22 +746,22 @@ class CharityBlockChain{//blockchain services
         console.log("Mined Successfully");
         let tempChain = this.getBlocks();
         tempChain.push(block);
-        console.log(tempChain);
+        console.log("Temchain",tempChain);
          //save database //cai dat peer2peer can xoa di
-        //  const blockObj = {
-        //     block_index: block.index,
-        //     block_timestamp: block.timestamp,
-        //     block_hash: block.hash,
-        //     block_previoushash: block.previousHash,
-        //     block_nonce: block.nonce,
-        //     block_difficulty: block.difficulty
-        // }
-        // //=================luu database project
-        // const addBlockResult = await blockchainModel.addNewBlock(blockObj);
-        // console.log("created Project:",addBlockResult);
-        // block.transactions.map(async(txs)=>{
-        //      await this.addTransactionInBlockToDB(txs,block.index);
-        // });
+         const blockObj = {
+            block_index: block.index,
+            block_timestamp: block.timestamp,
+            block_hash: block.hash,
+            block_previoushash: block.previousHash,
+            block_nonce: block.nonce,
+            block_difficulty: block.difficulty
+        }
+        //=================luu database project
+        const addBlockResult = await blockchainModel.addNewBlock(blockObj);
+        console.log("created Project:",addBlockResult);
+        block.transactions.map(async(txs)=>{
+             await this.addTransactionInBlockToDB(txs,block.index);
+        });
         //=========================>xoa
         this.io.emit(transactions.END_MINING, {
             blocks: tempChain,
@@ -642,9 +776,9 @@ class CharityBlockChain{//blockchain services
     //=======p2p model interaction ============
     parseChain(blocks) {
         this.blocks = blocks.map((block) => {
-        const parsedBlock = new Block(null,null,null,null,null,null,null);
-        parsedBlock.parseBlock(block);
-        return parsedBlock;
+            const parsedBlock = new Block(null,null,null,null,null,null,null);
+            parsedBlock.parseBlock(block);
+            return parsedBlock;
         });
     }
     checkValidity() {
@@ -737,7 +871,7 @@ class CharityBlockChain{//blockchain services
         if(transaction.type === "create"){
              transactionDBObj ={
                 transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
+                project_name: transaction.data.projectName,
                 block_index: block_index,
                 create_txs_project_beneficiary_create_address: transaction.data.projectBeneficiaryCreateAddress,
                 create_txs_project_create_timestamp: transaction.data.projectCreateTimestamp,
@@ -749,7 +883,7 @@ class CharityBlockChain{//blockchain services
         
              transactionDBObj ={
                 transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
+                project_name: transaction.data.projectName,
                 block_index: block_index,
                 confirm_txs_project_organization_confirm_address: transaction.data.projectOrganizationConfirmAddress,
                 confirm_txs_project_confirm_timestamp: transaction.data.projectConfirmTimestamp,
@@ -760,7 +894,7 @@ class CharityBlockChain{//blockchain services
         if(transaction.type==="donate"){
             transactionDBObj ={
                 transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
+                project_name: transaction.data.projectName,
                 block_index: block_index,
                 donate_txs_from_address: transaction.data.fromAddress,
                 donate_txs_to_address: transaction.data.toAddress,
@@ -774,7 +908,7 @@ class CharityBlockChain{//blockchain services
         if(transaction.type==="sendback"){
             transactionDBObj ={
                 transaction_type: transaction.type,
-                project_id: transaction.data.projectId,
+                project_name: transaction.data.projectName,
                 block_index: block_index,
                 sendback_txs_from_address: transaction.data.fromAddress,
                 sendback_txs_to_address: transaction.data.toAddress,

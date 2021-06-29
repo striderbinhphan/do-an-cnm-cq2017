@@ -1,5 +1,4 @@
 const db = require('../utils/db');
-
 module.exports = {
   //blocks model
   all() {
@@ -59,15 +58,7 @@ module.exports = {
   {
     return db('project').insert(projectTemp);
   },
-  updateConfirmAddress(projectId, address, timestamp){
-    console.log("testinggggggggggggggggggggggggggggggggggg",projectId);
-    return db('project').where({
-      project_id: projectId
-    }).update({
-      project_organization_confirm_address: address,
-      project_confirm_timestamp: timestamp
-    })
-  },
+  
   getProjectByID(projectID){
     return db('project').where('project_id',projectID);
  },
@@ -98,9 +89,7 @@ getAllProjectCreatedByBeneficiaryAddress(beneficiaryAddress){
   getPendingTransactions(){
     return db('pending_transactions');
   },
-  deletePendingTransactionBySignature(signature){
-    return db('pending_transactions').where('transaction_signature',signature).del();
-  }
+  
 
   //pendingTransaction model
   

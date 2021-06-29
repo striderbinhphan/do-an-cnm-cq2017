@@ -14,6 +14,6 @@ module.exports.transactions = {
   };
   
   module.exports.constants = {
-    TRANSACTIONS_IN_BLOCK: 4,
+    TRANSACTIONS_IN_BLOCK: 2,
   };
   
