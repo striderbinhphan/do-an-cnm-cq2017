@@ -59,6 +59,7 @@ app.post("/login", async (req, res) => {
     res.json({ status: "This address isn't exist! please register" }).end();
   }
 });
+
 app.get("/users",async (req, res) => {
   return  res.json(await charityBlockChain.getUserList()).end();
 });
@@ -102,9 +103,9 @@ app.get("/confirm-projects",async (req, res) => {
   res.json(await charityBlockChain.getConfirmProjectList()).end();
 });
 app.post("/unconfirm-projects", async (req, res) => {
-  const { projectName, projectOrganizationConfirmAddress, privateKey } = req.body;
+  const { projectId, projectOrganizationConfirmAddress, privateKey } = req.body;
   const confirmData = {
-    projectName,
+    projectId,
     projectOrganizationConfirmAddress,
     projectConfirmTimestamp: getFormattedDate(), //ms
   };
@@ -122,12 +123,12 @@ app.get("/donate-projects",async (req, res) => {
   res.json(await charityBlockChain.getDonateProjectList()).end();
 });
 app.post("/donate-projects", async (req, res) => {
-  const { projectName, fromAddress, amount, privateKey } = req.body;
-  console.log(projectName);
-  const toOrganizationAddress =await charityBlockChain.getOrganizationConfirmAddressFromprojectName(projectName);
+  const { projectId, fromAddress, amount, privateKey } = req.body;
+  console.log(projectId);
+  const toOrganizationAddress =await charityBlockChain.getOrganizationConfirmAddressFromProjectId(projectId);
   console.log(toOrganizationAddress);
   const donateData = {
-    projectName,
+    projectId,
     fromAddress,
     toAddress: toOrganizationAddress,
     amount,
@@ -143,7 +144,33 @@ app.post("/donate-projects", async (req, res) => {
     res.status(204).end();
   }
 });
+app.get("/sendback-projects",async(req,res)=>{
+  res.json(await charityBlockChain.getSendbackProjectList()).end();
+})
+app.post("/sendback-projects", async (req, res) => {
+  const { projectId, amount, privateKey } = req.body;
+  const toBeneficiaryAddress =
+    await charityBlockChain.getBeneficiaryAddressFromProjectId(projectId);
+  const fromAddress =
+    await charityBlockChain.getOrganizationConfirmAddressFromProjectId(projectId);
+  const sendbackInfo = {
+    projectId,
+    fromAddress,
+    toAddress: toBeneficiaryAddress,
+    amount,
+    donateTimestamp: new Date().getTime(), //ms,
+  };
+  console.log(sendbackInfo);
+  const confirmEcKey = ec.keyFromPrivate(privateKey, "hex");
+  if (await charityBlockChain.sendbackProject(sendbackInfo, confirmEcKey)) {
+    console.log("success");
 
+    res.status(201).end();
+  } else {
+    console.log("fail");
+    res.status(204).end();
+  }
+});
 app.get("/user/:address", async (req, res) => {
   const address = req.params.address;
   const list = await blockchainModel.getUserByAddress(address);
@@ -153,9 +180,10 @@ app.get("/user/:address", async (req, res) => {
   res.json(list[0]);
 });
 
+
 app.get("/project/:id/transactions", async (req, res) => {
   const id = +req.params.id;
-  const list = await blockchainModel.getTransactionByprojectName(id);
+  const list = await blockchainModel.getTransactionByProjectID(id);
   if (list.length === 0) {
     return res.status(204).end();
   }
@@ -164,7 +192,7 @@ app.get("/project/:id/transactions", async (req, res) => {
 
 app.get("/project/:id/donateTransactions", async (req, res) => {
   const id = +req.params.id;
-  const list = await blockchainModel.getDonateTransactionByprojectName(id);
+  const list = await blockchainModel.getDonateTransactionByProjectID(id);
   if (list.length === 0) {
     return res.status(204).end();
   }
@@ -172,7 +200,7 @@ app.get("/project/:id/donateTransactions", async (req, res) => {
 });
 app.get("/project/:id/sendbackTransactions", async (req, res) => {
   const id = +req.params.id;
-  const list = await blockchainModel.getSendbackTransactionByprojectName(id);
+  const list = await blockchainModel.getSendbackTransactionByProjectID(id);
   if (list.length === 0) {
     return res.status(204).end();
   }
@@ -216,7 +244,7 @@ app.get("/transaction/:id", async (req, res) => {
 
 app.get("/project/:id/totaldonate", async (req, res) => {
   const id = +req.params.id;
-  const ret = await blockchainModel.getTotalDonateByprojectName(id);
+  const ret = await blockchainModel.getTotalDonateByProjectID(id);
   if (ret[0].totaldonate === null) {
     result = {
       totaldonate: 0,
@@ -232,7 +260,7 @@ app.get("/project/:id/totaldonate", async (req, res) => {
 
 app.get("/project/:id/totalSendBack", async (req, res) => {
   const id = +req.params.id;
-  const ret = await blockchainModel.getTotalSendBackByprojectName(id);
+  const ret = await blockchainModel.getTotalSendBackByProjectID(id);
   if (ret[0].totalsendback === null) {
     result = {
       totalsendback: 0,
@@ -245,36 +273,11 @@ app.get("/project/:id/totalSendBack", async (req, res) => {
   };
   res.json(result);
 });
-app.get("/sendback-projects",async(req,res)=>{
-  res.json(await charityBlockChain.getSendbackProjectList()).end();
-})
-app.post("/sendback-projects", async (req, res) => {
-  const { projectName, amount, privateKey } = req.body;
-  const toBeneficiaryAddress =
-    charityBlockChain.getBeneficiaryAddressFromprojectName(projectName);
-  const fromAddress =
-    charityBlockChain.getOrganizationConfirmAddressFromprojectName(projectName);
-  const sendbackInfo = {
-    projectName,
-    fromAddress,
-    toAddress: toBeneficiaryAddress,
-    amount,
-    donateTimestamp: new Date().getTime(), //ms,
-  };
-  console.log(sendbackInfo);
-  const confirmEcKey = ec.keyFromPrivate(privateKey, "hex");
-  if (await charityBlockChain.sendbackProject(sendbackInfo, confirmEcKey)) {
-    console.log("success");
 
-    res.status(201).end();
-  } else {
-    console.log("fail");
-    res.status(204).end();
-  }
-});
 app.get("/donate-transactions", async (req, res) => {
   const list = await blockchainModel.getDonateTransactions();
   if (list.length === 0) {
+    console.log("Is empty");
     return res.status(204).end();
   }
   res.json(list);

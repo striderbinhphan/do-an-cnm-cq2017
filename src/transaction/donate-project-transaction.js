@@ -2,8 +2,8 @@ const SHA256 = require("crypto-js/sha256");
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 class DonateTransaction{
-    constructor(projectName, fromAddress, toAddress, amount, donateTimestamp,signature) {
-        this.projectName  = projectName; 
+    constructor(projectId, fromAddress, toAddress, amount, donateTimestamp,signature) {
+        this.projectId  = projectId; 
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount  = amount;
@@ -11,7 +11,7 @@ class DonateTransaction{
         this.signature = null || signature;
     }
     calculateHash(){
-        return SHA256(this.projectName + this.fromAddress+this.toAddress+this.amount+this.donateTimestamp).toString();
+        return SHA256(this.projectId + this.fromAddress+this.toAddress+this.amount+this.donateTimestamp).toString();
     }
     signTransaction(senderEcKey){
         console.log("signing donate transaction");
@@ -26,7 +26,7 @@ class DonateTransaction{
         return true;
     }
     isValidTransaction(){
-        if(this.projectName  === null){
+        if(this.projectId  === null){
             return false
         };
         if(!this.signature || this.signature.length ===0){
@@ -37,7 +37,7 @@ class DonateTransaction{
         return publicKey.verify(this.calculateHash(),this.signature);
     }
     parseData(data) {
-        this.projectName  = data.projectName; 
+        this.projectId  = data.projectId; 
         this.fromAddress = data.fromAddress;
         this.toAddress = data.toAddress;
         this.amount  = data.amount;

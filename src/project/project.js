@@ -36,5 +36,8 @@ class Project{
         this.projectDeadline = projectData.projectDeadline;
         this.projectCreateTimestamp = projectData.projectCreateTimestamp;
     }
+    setProjectId(projectId){
+        this.projectId = projectId;
+    }
 }   
 module.exports = Project;

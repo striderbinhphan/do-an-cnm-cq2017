@@ -52,6 +52,12 @@ const socketListeners = (io, socket, chain) => {
     console.log("added new User to our ledger", newUser);
     chain.register(newUser);
   });
+  
+  socket.on(transactions.ADD_PROJECT,(newProjectInfo)=>{
+    console.log("added new project to our ledger",newProjectInfo);
+    chain.addProject(newProjectInfo);
+  });
+  
   socket.on(transactions.ADD_TRANSACTION, (newTransaction) => {
     const tx = new Transaction(null,null);
     tx.parseData(newTransaction);
@@ -59,10 +65,6 @@ const socketListeners = (io, socket, chain) => {
     console.info(
       `Added action: ${JSON.stringify(tx)}`
     );
-  });
-  socket.on(transactions.ADD_PROJECT,(newProject)=>{
-    console.log("added new project to our ledger",newProject);
-    chain.addProject(newProject);
   });
   
   socket.on(transactions.CONFIRM_PROJECT,(confirmData)=>{
