@@ -85,7 +85,7 @@ app.post("/projects", async (req, res) => {
     projectName,
     projectBeneficiaryCreateAddress,
     projectDescription,
-    projectDeadline,
+    projectDeadline: getFormattedDate(projectDeadline),
     projectCreateTimestamp: getFormattedDate(),
   };
   console.log(project);
