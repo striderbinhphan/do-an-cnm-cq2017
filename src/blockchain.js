@@ -702,12 +702,12 @@ class CharityBlockChain{//blockchain services
         return true;
     }
     async confirmBlock() {
-       //"Someone confirm");
+        console.log("Someone confirm");
         if (!this.isConfirm) {
           this.confirm++;
           let totalNodes = this.nodes.length + 1;
           if (this.confirm >= totalNodes / 2) {
-           //"Enough confirm");
+            console.log("Enough confirm");
             this.miningStatus = false;
             this.confirm = 0;
             const tempBlock = new Block(null,null,null,null,null,null,null);
@@ -791,12 +791,12 @@ class CharityBlockChain{//blockchain services
         return await blockchainModel.addTransactionInBlock(transactionDBObj);
     }
     denyBlock(){
-       //"Someone deny");
+        console.log("Someone deny");
         if (!this.isConfirm) {
           this.deny++;
           let totalNodes = this.nodes.length + 1;
           if (this.deny >= totalNodes / 2) {
-           //"Enough deny");
+            console.log("Enough deny");
             this.miningStatus = false;
             this.deny = 0;
             this.blocksBuffer = null;
