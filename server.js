@@ -102,6 +102,9 @@ app.post("/projects", async (req, res) => {
 app.get("/confirm-projects",async (req, res) => {
   res.json(await charityBlockChain.getConfirmProjectList()).end();
 });
+app.get("/unconfirm-projects",async (req, res) => {
+  res.json(await charityBlockChain.getUnconfirmProjectList()).end();
+});
 app.post("/unconfirm-projects", async (req, res) => {
   const { projectId, projectOrganizationConfirmAddress, privateKey } = req.body;
   const confirmData = {

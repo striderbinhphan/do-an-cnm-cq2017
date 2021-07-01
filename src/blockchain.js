@@ -185,6 +185,9 @@ class CharityBlockChain{//blockchain services
     getConfirmProjectList(){
         return projectModel.getConfirmProjectList();
     }
+    getUnconfirmProjectList(){
+        return projectModel.getUnconfirmProjectList();
+    }
     async getDonateProjectList(){
         const currentDate = new Date().getTime();
         const projectList =await projectModel.all();

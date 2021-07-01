@@ -7,7 +7,7 @@ module.exports = {
         return db('project').insert(newProject);
     },
     getConfirmProjectList(){
-        return db('project').where("project_organization_confirm_address", null);
+        return db('project').whereNot("project_organization_confirm_address", null);
     },
     async isExistProject(projectName){
         const result =  await db('project').where("project_name",projectName);
@@ -16,6 +16,9 @@ module.exports = {
         }else{
             return true;
         }
+    },
+    getUnconfirmProjectList(){
+        return db('project').where("project_organization_confirm_address", null);
     },
     async isExistProjectById(projectId){
         const result =  await db('project').where("project_id",projectId);
