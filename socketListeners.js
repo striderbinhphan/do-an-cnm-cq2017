@@ -13,36 +13,6 @@ const BlockChain = require("./src/blockchain");
 const socketListeners = (io, socket, chain) => {
   
 
-  socket.on(transactions.WRONG_HASH_GENERATE, () => {
-    chain.denyBlock();
-  });
-
-  socket.on(transactions.HELLO, () => {
-    console.log("hello");
-  });
-
-  socket.on(transactions.CHAIN_VERIFY, () => {
-    chain.confirmBlock();
-  });
-
-
-
-  // socket.on(transactions.ADD_TRANSACTION, (data) => {
-  //   const { year, name, nominees, deadline } = data;
-  //   chain.setElection(year, name, nominees, deadline);
-  // });
-
-  // socket.on(transactions.EXTEND_PROJECT_DEADLINE, (data) => {
-  //   const { year, name, newDeadline } = data;
-  //   chain.extentElection(year, name, newDeadline);
-  // });
-
-  socket.on(transactions.CHECKING, () => {
-    console.log("Im OK");
-  });
-  
-  
-
 
   //OK OKKKKKKKKOKKKKKKKKKKKKKKKKKKKK methods
   //OK OKKKKKKKKOKKKKKKKKKKKKKKKKKKKK methods
@@ -80,10 +50,16 @@ const socketListeners = (io, socket, chain) => {
       chain.reset();
       const blockChain = new BlockChain();
       blockChain.parseChain(blocks);
+      console.log("incoming block chainnnnnnnnnnnnnn", blockChain);
+      console.log("incoming block chainnnnnnnnnnnnnn length", blockChain.getLength());
+      console.log("currents block chainnnnnnnnnnnnnn", chain);
+     
+      console.log("currents block chainnnnnnnnnnnnnn length", chain.getLength());
       if (
         blockChain.checkValidity() &&
         blockChain.getLength() >= chain.getLength()
       ) {
+        console.log("Peep2peer check chain", chain.getBlocks());
         console.log("The chain pass first check");
         if (chain.compareCurrentBlock(blockChain.blocks)) {
           console.log("The chain pass all check");
@@ -93,18 +69,32 @@ const socketListeners = (io, socket, chain) => {
           console.log("The chain fail second check");
           io.emit(transactions.WRONG_HASH_GENERATE);
           chain.denyBlock();
-          socket.disconnect();
-          chain.nodes.splice(chain.nodes.indexOf(socket), 1);
         }
       } else {
         console.log("Something is wrong with the chain");
         io.emit(transactions.WRONG_HASH_GENERATE);
         chain.denyBlock();
-        socket.disconnect();
-        chain.nodes.splice(chain.nodes.indexOf(socket), 1);
       }
     });
   });
+  
+  socket.on(transactions.WRONG_HASH_GENERATE, () => {
+    chain.denyBlock();
+  });
+
+  socket.on(transactions.HELLO, () => {
+    console.log("hello");
+  });
+
+  socket.on(transactions.CHAIN_VERIFY, () => {
+    chain.confirmBlock();
+  });
+
+  socket.on(transactions.CHECKING, () => {
+    console.log("Im OK");
+  });
+  
+  
 
   return socket;
 };

@@ -41,7 +41,7 @@ class CharityBlockChain{//blockchain services
         const blocksFromDB =  await blockchainModel.all();
         // const blockIndexList = blocksFromDB.map((b)=>b.block_index).map(async(index) =>{
         //     const transactionInBlock = await blockchainModel.getTransactionByBlockIndex(index);
-        //     console.log(transactionInBlock);
+        //    //transactionInBlock);
         // });
         //console.log(blocksFromDB);
         const blockIndexList = blocksFromDB.map(async(b) =>{
@@ -64,7 +64,7 @@ class CharityBlockChain{//blockchain services
                 signature : transaction.transaction_signature,
             }
             const createdTxs = new Transaction("create",objData);
-            console.log(createdTxs);
+           //createdTxs);
             return createdTxs;
         }
         if(transaction.transaction_type==="confirm"){
@@ -76,7 +76,7 @@ class CharityBlockChain{//blockchain services
                 signature: transaction.transaction_signature
             }
             const confirmedTxs = new Transaction("confirm",objData);
-            console.log(confirmedTxs);
+           //confirmedTxs);
             return confirmedTxs;
         }
         if(transaction.transaction_type==="donate"){
@@ -89,7 +89,7 @@ class CharityBlockChain{//blockchain services
                 signature: transaction.transaction_signature
             }
             const donatedTxs = new Transaction("donate",objData);
-            console.log(donatedTxs);
+           //donatedTxs);
             
             return donatedTxs;
         }
@@ -104,7 +104,7 @@ class CharityBlockChain{//blockchain services
                 signature: transaction.transaction_signature
             }
             const sendbackTxs = new Transaction("sendback",objData);
-            console.log(sendbackTxs);
+           //sendbackTxs);
 
             return sendbackTxs;
         }
@@ -162,7 +162,7 @@ class CharityBlockChain{//blockchain services
         return this.blocks[this.blocks.length -1];
     }
     getLength(){
-        return this.blocks.length();
+        return this.blocks.length;
     }
 
 
@@ -226,12 +226,12 @@ class CharityBlockChain{//blockchain services
     };
     async createProject(newProjectInfo,ecKey){
         if(!this.isUserExisting(newProjectInfo.projectBeneficiaryCreateAddress)){
-            console.log("User address isn't existing in our system, pls register!");
+           //"User address isn't existing in our system, pls register!");
             return false;
         }
         if(!await this.isProjectExistingByProjectName(newProjectInfo.projectName)){
             if(ecKey.getPublic('hex') != newProjectInfo.projectBeneficiaryCreateAddress){
-                console.log('You cannot sign transaction with another wallets!')
+               //'You cannot sign transaction with another wallets!')
                 return false;
             }else{
                 const projectTemp = new charityProject(null,null,null,null,null,null,null);
@@ -248,7 +248,7 @@ class CharityBlockChain{//blockchain services
                 }
                 //=================luu database project
                 const addProjectResult = await projectModel.addNewProject(newProject);
-                console.log("created Project:",addProjectResult);
+               //"created Project:",addProjectResult);
 
                 newProjectInfo.projectId = await projectModel.getProjectId(projectTemp.projectName);
                 
@@ -264,42 +264,39 @@ class CharityBlockChain{//blockchain services
                 await this.addTransaction(createdTxs)
                 //broadcast create transaction
                 this.io.emit(transactions.ADD_TRANSACTION,createdTxs);
-                console.log("add create transaction", createdTxs);
+               //"add create transaction", createdTxs);
                 return true;
             }
         }
         else{
-            console.log("This charity project has name which existing in our blockchain");
+           //"This charity project has name which existing in our blockchain");
             return false;
         }
     };
-    addProject(newProjectInfo){
+    async addProject(newProjectInfo){
         const projectTemp = new charityProject(null,null,null,null,null,null,null);
         projectTemp.setInfo(newProjectInfo);
-
         //bien luu gia tri luu vao db
         const newProject = {
             project_id: projectTemp.projectId,
             project_name: projectTemp.projectName,
-            project_beneficiary_create_address: projectTemp.projectBeneficiaryCreateAddress,
-            project_organization_confirm_address: projectTemp.projectOrganizationConfirmAddress,
+            project_beneficiary_create_address: projectTemp.projectBeneficiaryCreateAddress, 
             project_description: projectTemp.projectDescription,
             project_create_timestamp: projectTemp.projectCreateTimestamp,
-            project_confirm_timestamp: projectTemp.projectConfirmTimestamp,
             project_deadline: projectTemp.projectDeadline
         }
-        return projectModel.addNewProject(newProject);
+        return await projectModel.addNewProject(newProject);
     }
     //==========add transactino involved methods ===========
     async addTransaction(transaction){
         if(transaction.isValidTransaction()){
-            
+           //"testttttttttttttttttttttttttt", this.getBlocks());
             const result = await this.addTransactionToPendingTransactionDatabase(transaction);
-            console.log("added transaction: ", result)
+           //"added transaction: ", result)
             await this.miningBlock();
             return true;
         }else{
-            console.log("This transaction is invalid");
+           //"This transaction is invalid");
             return false;
         }
     }
@@ -362,12 +359,12 @@ class CharityBlockChain{//blockchain services
     }
     async confirmProject(projectInfo,confirmEcKey){
         if(!this.isUserExisting(projectInfo.projectOrganizationConfirmAddress)){
-            console.log("User address isn't existing in our system, pls register!");
+           //"User address isn't existing in our system, pls register!");
             return false;
         }
         //console.log("check",await this.isExistingProjectById(projectInfo.projectName),await this.isConfirmed(projectInfo.projectName));
         if(await this.isProjectExistingByProjectId(projectInfo.projectId)&& await this.isUnconfirmed(projectInfo.projectId)){
-           console.log("vao oke");
+          //"vao oke");
             const confirmTxs = new Transaction("confirm",projectInfo);
             if(confirmTxs.signTransaction(confirmEcKey)){
                 if(await this.addTransaction(confirmTxs)){ 
@@ -384,7 +381,7 @@ class CharityBlockChain{//blockchain services
                     //delete projectTemp;
                     return true;
                 }else{
-                    console.log("This transaction is invalid(matched add & privateKey)");
+                   //"This transaction is invalid(matched add & privateKey)");
     
                     return false;
                 }
@@ -394,12 +391,13 @@ class CharityBlockChain{//blockchain services
             }
         }
         else{
-            console.log("This charity project has id which existing in our blockchain & this charity project has been confirmed");
+           //"This charity project has id which existing in our blockchain & this charity project has been confirmed");
             return false;
         }
     }
-    updateProject(confirmData){
-        return  projectModel.updateConfirmAddress(confirmData.projectId,confirmData.address,confirmData.timestamp);
+    //other nodes
+    async updateProject(confirmData){
+        return await projectModel.updateConfirmAddress(confirmData.projectId,confirmData.address,confirmData.timestamp);
     }
 
     //===donate
@@ -413,7 +411,7 @@ class CharityBlockChain{//blockchain services
 
     async donateProject(donateInfo,donaterEcKey){
         if(!this.isUserExisting(donateInfo.fromAddress)||!this.isUserExisting(donateInfo.toAddress)){
-            console.log("User address isn't existing in our system, pls register!");
+           //"User address isn't existing in our system, pls register!");
             return false;
         }
         if(await this.isProjectExistingByProjectId(donateInfo.projectId)){
@@ -423,12 +421,12 @@ class CharityBlockChain{//blockchain services
                 const donateTxs = new Transaction("donate",donateInfo);
                 if(donateTxs.signTransaction(donaterEcKey)){
                     if(await this.addTransaction(donateTxs)){
-                        console.log("donate transaction is made");
+                       //"donate transaction is made");
                         this.io.emit(transactions.ADD_TRANSACTION,donateTxs);
                         
                         return true;
                     } else{
-                        console.log("This transaction is invalid(matched add & privateKey)");
+                       //"This transaction is invalid(matched add & privateKey)");
     
                         return false;
                     }
@@ -443,7 +441,7 @@ class CharityBlockChain{//blockchain services
            
         }
         else{
-            console.log("This charity project has id which existing in our blockchain");
+           //"This charity project has id which existing in our blockchain");
             return false;
         }
     }
@@ -456,7 +454,7 @@ class CharityBlockChain{//blockchain services
     //============sending money from donate => organization or organization to beneficiary
     async sendbackProject(sendbackInfo,orgaEcKey){
         if(!this.isUserExisting(sendbackInfo.fromAddress)||!this.isUserExisting(sendbackInfo.toAddress)){
-            console.log("User address isn't existing in our system, pls register!");
+           //"User address isn't existing in our system, pls register!");
             return false;
         }
         if(this.isProjectExistingByProjectId(sendbackInfo.projectId)){
@@ -465,8 +463,8 @@ class CharityBlockChain{//blockchain services
 
             if(confirmAddress!==sendbackInfo.fromAddress ||
                 beneAddress!==sendbackInfo.toAddress){
-                console.log(`From address must be ${confirmAddress}`);
-                console.log(`To address must be ${beneAddress}`);
+               //`From address must be ${confirmAddress}`);
+               //`To address must be ${beneAddress}`);
 
                 return false;
             }else{
@@ -476,7 +474,7 @@ class CharityBlockChain{//blockchain services
                         this.io.emit(transactions.ADD_TRANSACTION,sendbackTxs);
                         return true;
                     } else{
-                    console.log("This transaction is invalid(matched add & privateKey)");
+                   //"This transaction is invalid(matched add & privateKey)");
                         return false;
                     }
                 }else{
@@ -486,7 +484,7 @@ class CharityBlockChain{//blockchain services
             }
         }
         else{
-            console.log("This charity project has id which existing in our blockchain");
+           //"This charity project has id which existing in our blockchain");
             return false;
         }
     }
@@ -506,7 +504,7 @@ class CharityBlockChain{//blockchain services
                 signature : txData.transaction_signature,
             }
             const createdTxs = new Transaction("create",objData);
-            console.log(createdTxs);
+           //createdTxs);
             return createdTxs;
         }
         if(txData.transaction_type==="confirm"){
@@ -518,7 +516,7 @@ class CharityBlockChain{//blockchain services
                 signature: txData.transaction_signature
             }
             const confirmedTxs = new Transaction("confirm",objData);
-            console.log(confirmedTxs);
+           //confirmedTxs);
             return confirmedTxs;
         }
         if(txData.transaction_type==="donate"){
@@ -531,7 +529,7 @@ class CharityBlockChain{//blockchain services
                 signature: txData.transaction_signature
             }
             const donatedTxs = new Transaction("donate",objData);
-            console.log(donatedTxs);
+           //donatedTxs);
             
             return donatedTxs;
         }
@@ -546,7 +544,7 @@ class CharityBlockChain{//blockchain services
                 signature: txData.transaction_signature
             }
             const sendbackTxs = new Transaction("sendback",objData);
-            console.log(sendbackTxs);
+           //sendbackTxs);
 
             return sendbackTxs;
         }
@@ -565,7 +563,7 @@ class CharityBlockChain{//blockchain services
     async miningBlock(){
         
         const pendingTransactionsLength = await this.getPendingTransactionLength();
-        console.log("length",pendingTransactionsLength);
+       //"length",pendingTransactionsLength);
         //console.log("pending txs",await this.getPendingTransactions());
         if (pendingTransactionsLength >= constants.TRANSACTIONS_IN_BLOCK && !this.miningStatus) {//1
             this.miningStatus = true;
@@ -574,14 +572,14 @@ class CharityBlockChain{//blockchain services
                 ? constants.TRANSACTIONS_IN_BLOCK
                 : pendingTransactionsLength;
             
-            console.log(spliceNumber);
+           //spliceNumber);
 
            
             const pendingTransactions =await this.getPendingTransactions();
 
-            this.transactionBuffer = pendingTransactions.splice(0, spliceNumber);//1 //pendingtxs :5 => 1
-            const delTransaction = this.transactionBuffer;
-            console.log(delTransaction);
+            
+            const delTransaction = pendingTransactions.splice(0, spliceNumber);//1 //pendingtxs :5 => 1;
+           //delTransaction);
             //detele database
             delTransaction.map(async (txs)=>{
                 //console.log("dele pending db data", txs);
@@ -591,24 +589,27 @@ class CharityBlockChain{//blockchain services
             console.info("Starting mining block...");
             const previousBlock = this.getLatestBlock();
             //console.log(previousBlock);
-            const transactionsInBlock = this.transactionBuffer.map((txData) => {
+            this.transactionBuffer = delTransaction.map((txData) => {
                 return this.convertDBDataToVariableData(txData);;
             });
             //console.log("transaction in blockkkkkkkkk",transactionsInBlock);
             const currentTimestamp = getFormattedDate();
 
             const blockObj = {
-                index: previousBlock.getIndex() + 1,
+                index: previousBlock.index+ 1,
                 timestamp: currentTimestamp,
-                transactions: transactionsInBlock,
+                transactions: this.transactionBuffer,
                 previousHash: previousBlock.hash,
                 difficulty: this.difficulty
             }//mining service
-            console.log("test blokkkkkkkkkkkkkkkkk",blockObj);
+            
             fork().send(blockObj);
             fork().on("message", (nonce) => {
               let block = new Block(blockObj.index,blockObj.timestamp,blockObj.transactions,
                 blockObj.previousHash,nonce,blockObj.difficulty);
+                console.log("block is mined",block);
+                console.log("calculate hash",calculateHashFromBlock(block));
+
                 //console.log(block);
                 this.mineBlock(block);
             });
@@ -618,29 +619,15 @@ class CharityBlockChain{//blockchain services
         this.blocksBuffer = block;
         this.confirm++;
         this.reset();//note 
-        console.log("Mined Successfully");
-        let tempChain = this.getBlocks();
+       //"Mined Successfully");
+        let tempChain = this.blocks;
         tempChain.push(block);
-        console.log("Temchain",tempChain);
-         //save database //cai dat peer2peer can xoa di
-         const blockObj = {
-            block_index: block.index,
-            block_timestamp: block.timestamp,
-            block_hash: block.hash,
-            block_previoushash: block.previousHash,
-            block_nonce: block.nonce,
-            block_difficulty: block.difficulty
-        }
-        //=================luu database project
-        const addBlockResult = await blockchainModel.addNewBlock(blockObj);
-        console.log("created Project:",addBlockResult);
-        block.transactions.map(async(txs)=>{
-             await this.addTransactionInBlockToDB(txs,block.index);
-        });
+       //"Temchain",tempChain);
         //=========================>xoa
         this.io.emit(transactions.END_MINING, {
             blocks: tempChain,
         });
+        this.blocks.splice(this.blocks.length-1,1);
     }
     reset(){
         this.deny = 0;
@@ -661,43 +648,51 @@ class CharityBlockChain{//blockchain services
         let previousBlock = blocks[0];
         for (let index = 1; index < blocks.length; index++) {
           const currentBlock = blocks[index];
+          
           if (currentBlock.previousHash !== previousBlock.hash) {
-            return false;
-          }
-          if (!hashMatchesDifficulty(calculateHashFromBlock(currentBlock))&&calculateHashFromBlock(currentBlock)!==currentBlock.hash) {
+            console.log("dont' pass previous hash");
             return false;
           }
           if (currentBlock.index !== index) {
+            console.log("dont' pass index");
+
             return false;
           }
+          if (!hashMatchesDifficulty(calculateHashFromBlock(currentBlock),this.difficulty)&&calculateHashFromBlock(currentBlock)!==currentBlock.hash) {
+            console.log("dont pass hash match difficulty");
+            console.log("current blocks",currentBlock);
+            console.log("hash match difficulty", calculateHashFromBlock(currentBlock), currentBlock.hash);
+            console.log("hash match difficulty", hashMatchesDifficulty(calculateHashFromBlock(currentBlock),this.difficulty));
+            return false;
+          }
+         
           previousBlock = currentBlock;
         }
+        console.log('check validity oke')
         return true;
     }
     compareCurrentBlock(otherBlocks){
         const { blocks } = this;
         if (otherBlocks.length !== blocks.length + 1) {
-            console.log("Wrong block length");
+           //"Wrong block length");
             return false;
         }
 
         for (let index = 0; index < blocks.length; index++) {
             if (blocks[index].hash !== otherBlocks[index].hash) {
-                console.log("Wrong block hash");
-                console.log(blocks[index]);
-                console.log(otherBlocks[index]);
+               //"Wrong block hash");
+               //blocks[index]);
+               //otherBlocks[index]);
                 return false;
             }
         }
         let newBlockTransactions = otherBlocks[otherBlocks.length - 1].transactions;
 
-        for (let index1 = 0; index1 < this.actionBuffer.length; index1++) {
-            if (
-                newBlockTransactions[index1] !== this.transactionBuffer[index1]
-            ) {
-                console.log("Wrong transaction");
-                console.log(newBlockTransactions[index1]);
-                console.log(this.transactionBuffer[index1]);
+        for (let index1 = 0; index1 < this.transactionBuffer.length; index1++) {
+            if (JSON.stringify(newBlockTransactions[index1]) !== JSON.stringify(this.transactionBuffer[index1])) {
+               //"Wrong transaction:");
+               //txs);
+               //this.transactionBuffer[index1]);
                 return false;
             }
         }
@@ -707,12 +702,12 @@ class CharityBlockChain{//blockchain services
         return true;
     }
     async confirmBlock() {
-        console.log("Someone confirm");
+       //"Someone confirm");
         if (!this.isConfirm) {
           this.confirm++;
           let totalNodes = this.nodes.length + 1;
           if (this.confirm >= totalNodes / 2) {
-            console.log("Enough confirm");
+           //"Enough confirm");
             this.miningStatus = false;
             this.confirm = 0;
             const tempBlock = new Block(null,null,null,null,null,null,null);
@@ -729,7 +724,7 @@ class CharityBlockChain{//blockchain services
             }
             //=================luu database project
             const addBlockResult = await blockchainModel.addNewBlock(blockObj);
-            console.log("created Project:",addBlockResult);
+           //"created Project:",addBlockResult);
             tempBlock.transactions.map(async(txs)=>{
                  await this.addTransactionInBlockToDB(txs,tempBlock.index);
             });
@@ -741,7 +736,7 @@ class CharityBlockChain{//blockchain services
         }
     }
     async addTransactionInBlockToDB(transaction, block_index){
-        console.log("test function", transaction);
+       //"test function", transaction);
         let transactionDBObj = null;
         if(transaction.type === "create"){
              transactionDBObj ={
@@ -796,43 +791,44 @@ class CharityBlockChain{//blockchain services
         return await blockchainModel.addTransactionInBlock(transactionDBObj);
     }
     denyBlock(){
-        console.log("Someone deny");
+       //"Someone deny");
         if (!this.isConfirm) {
           this.deny++;
           let totalNodes = this.nodes.length + 1;
           if (this.deny >= totalNodes / 2) {
-            console.log("Enough deny");
+           //"Enough deny");
             this.miningStatus = false;
             this.deny = 0;
             this.blocksBuffer = null;
             this.isConfirm = true;
-            this.reMiningBlock();
+            this.transactionBuffer = null;
+            //this.reMiningBlock();
           }
         }
     }
-    async reMiningBlock() {
-        console.info("Starting mining block...");
-        const previousBlock = this.lastBlock();
-        //process.env.BREAK = false;
-        const transactionsInBlock = this.transactionBuffer.map((txData) => {
-          let tx = new Transaction(null,null);
-          tx.parseData(txData);
-          return tx;
-        });
-        const blockObj = {
-            index: previousBlock.getIndex() + 1,
-            timestamp: currentTimestamp,
-            transactions: transactionsInBlock,
-            previousHash: previousBlock.hash,
-            difficulty: this.difficulty
-        }
-        fork().send(blockObj);
-        fork().on("message", (nonce) => {
-          let block = new Block(blockObj.index,blockObj.timestamp,blockObj.transactions,
-            blockObj.previousHash,nonce,blockObj.difficulty);
-            //console.log(block);
-            this.mineBlock(block);
-        });
-    }
+    // async reMiningBlock() {
+    //     console.info("Starting mining block...");
+    //     const previousBlock = this.getLatestBlock();
+    //     //process.env.BREAK = false;
+    //     const transactionsInBlock = this.transactionBuffer.map((txData) => {
+    //       let tx = new Transaction(null,null);
+    //       tx.parseData(txData);
+    //       return tx;
+    //     });
+    //     const blockObj = {
+    //         index: previousBlock.getIndex() + 1,
+    //         timestamp: currentTimestamp,
+    //         transactions: transactionsInBlock,
+    //         previousHash: previousBlock.hash,
+    //         difficulty: this.difficulty
+    //     }
+    //     fork().send(blockObj);
+    //     fork().on("message", (nonce) => {
+    //       let block = new Block(blockObj.index,blockObj.timestamp,blockObj.transactions,
+    //         blockObj.previousHash,nonce,blockObj.difficulty);
+    //         //console.log(block);
+    //         this.mineBlock(block);
+    //     });
+    // }
 }
 module.exports = CharityBlockChain ;
